@@ -8,6 +8,7 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.utils.html_utils import clean_html
+from frappe.utils import cstr
 
 class StockSettings(Document):
 	def validate(self):
@@ -49,7 +50,7 @@ class StockSettings(Document):
 
 		db_batch_wise_valuation = frappe.db.get_single_value("Stock Settings", "batch_wise_valuation")
 
-		if db_batch_wise_valuation and db_batch_wise_valuation != self.batch_wise_valuation:
+		if cstr(db_batch_wise_valuation) != cstr(self.batch_wise_valuation):
 			# check if there are any stock ledger entries against items
 			# which does not have batch wise valuation defined
 			sle = frappe.db.sql("""select name from `tabStock Ledger Entry` sle

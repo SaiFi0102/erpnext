@@ -103,6 +103,13 @@ class update_entries_after(object):
 		self.precision = get_field_precision(frappe.get_meta("Stock Ledger Entry").get_field("stock_value"),
 			currency=frappe.get_cached_value('Company',  self.company,  "default_currency"))
 
+		self.qty_db_precision = get_field_precision(frappe.get_meta("Stock Ledger Entry").get_field("actual_qty"))
+		self.qty_db_precision = 6 if cint(self.qty_db_precision) <= 6 else 9
+
+		self.val_rate_db_precision = get_field_precision(frappe.get_meta("Stock Ledger Entry").get_field("valuation_rate"),
+			currency=frappe.get_cached_value('Company',  self.company,  "default_currency"))
+		self.val_rate_db_precision = 6 if cint(self.qty_db_precision) <= 6 else 9
+
 		self.prev_stock_value = self.previous_sle.stock_value or 0.0
 		self.stock_queue = json.loads(self.previous_sle.stock_queue or "[]")
 		self.valuation_method, self.batch_wise_valuation = get_valuation_method(self.item_code)
@@ -329,11 +336,12 @@ class update_entries_after(object):
 			# last row has the same rate, just updated the qty
 			if self.stock_queue[-1][1]==incoming_rate:
 				self.stock_queue[-1][0] += actual_qty
+				self.stock_queue[-1][0] = flt(self.stock_queue[-1][0], self.qty_db_precision)
 			else:
 				if self.stock_queue[-1][0] > 0:
 					self.stock_queue.append([actual_qty, incoming_rate])
 				else:
-					qty = self.stock_queue[-1][0] + actual_qty
+					qty = flt(self.stock_queue[-1][0] + actual_qty, self.qty_db_precision)
 					self.stock_queue[-1] = [qty, incoming_rate]
 		else:
 			qty_to_pop = abs(actual_qty)
@@ -362,7 +370,7 @@ class update_entries_after(object):
 					if index == None:
 						new_stock_value = sum((d[0]*d[1] for d in self.stock_queue)) - qty_to_pop*outgoing_rate
 						new_stock_qty = sum((d[0] for d in self.stock_queue)) - qty_to_pop
-						self.stock_queue = [[new_stock_qty, new_stock_value/new_stock_qty if new_stock_qty > 0 else outgoing_rate]]
+						self.stock_queue = [[flt(new_stock_qty, self.qty_db_precision), flt(new_stock_value/new_stock_qty, self.val_rate_db_precision) if new_stock_qty > 0 else outgoing_rate]]
 						break
 				else:
 					index = 0
@@ -371,7 +379,7 @@ class update_entries_after(object):
 				batch = self.stock_queue[index]
 				if qty_to_pop >= batch[0]:
 					# consume current batch
-					qty_to_pop = qty_to_pop - batch[0]
+					qty_to_pop = flt(qty_to_pop - batch[0], self.qty_db_precision)
 					self.stock_queue.pop(index)
 					if not self.stock_queue and qty_to_pop:
 						# stock finished, qty still remains to be withdrawn
@@ -382,7 +390,7 @@ class update_entries_after(object):
 				else:
 					# qty found in current batch
 					# consume it and exit
-					batch[0] = batch[0] - qty_to_pop
+					batch[0] = flt(batch[0] - qty_to_pop, self.qty_db_precision)
 					qty_to_pop = 0
 
 		stock_value = sum((flt(batch[0]) * flt(batch[1]) for batch in self.stock_queue))
@@ -392,7 +400,7 @@ class update_entries_after(object):
 			self.valuation_rate = stock_value / flt(stock_qty)
 
 		if not self.stock_queue:
-			self.stock_queue.append([0, sle.incoming_rate or sle.outgoing_rate or self.valuation_rate])
+			self.stock_queue.append([0, flt(sle.incoming_rate or sle.outgoing_rate or self.valuation_rate, self.val_rate_db_precision)])
 
 	def check_if_allow_zero_valuation_rate(self, voucher_type, voucher_detail_no):
 		ref_item_dt = ""
