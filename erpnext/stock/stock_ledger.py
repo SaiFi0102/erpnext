@@ -271,7 +271,7 @@ class update_entries_after(object):
 	def get_moving_average_values(self, sle):
 		actual_qty = flt(sle.actual_qty)
 		prev_qty = flt(self.batch_data.batch_qty_after_transaction if self.batch_wise_valuation else self.qty_after_transaction)
-		new_qty = prev_qty + actual_qty
+		new_qty = flt(prev_qty + actual_qty, self.qty_db_precision)
 		prev_valuation_rate = flt(self.batch_data.batch_valuation_rate if self.batch_wise_valuation else self.valuation_rate)
 		new_valuation_rate = prev_valuation_rate
 
