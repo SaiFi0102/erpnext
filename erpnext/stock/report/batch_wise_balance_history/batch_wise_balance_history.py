@@ -13,7 +13,7 @@ def execute(filters=None):
 
 	columns = get_columns(filters)
 	item_map = get_item_details(filters)
-	iwb_map = get_item_warehouse_batch_map(filters, float_precision)
+	iwb_map = get_item_warehouse_batch_map(filters)
 
 	data = []
 	for item in sorted(iwb_map):
@@ -91,7 +91,7 @@ def get_stock_ledger_entries(filters):
 		where docstatus < 2 and ifnull(batch_no, '') != '' {0} {1} order by item_code, warehouse
 		""".format(conditions, item_conditions), filters, as_dict=1)
 
-def get_item_warehouse_batch_map(filters, float_precision):
+def get_item_warehouse_batch_map(filters):
 	sle = get_stock_ledger_entries(filters)
 	iwb_map = {}
 
@@ -105,16 +105,14 @@ def get_item_warehouse_batch_map(filters, float_precision):
 			}))
 		qty_dict = iwb_map[d.item_code][d.warehouse][d.batch_no]
 		if d.posting_date < from_date:
-			qty_dict.opening_qty = flt(qty_dict.opening_qty, float_precision) \
-				+ flt(d.actual_qty, float_precision)
+			qty_dict.opening_qty = qty_dict.opening_qty + d.actual_qty
 		elif d.posting_date >= from_date and d.posting_date <= to_date:
 			if flt(d.actual_qty) > 0:
-				qty_dict.in_qty = flt(qty_dict.in_qty, float_precision) + flt(d.actual_qty, float_precision)
+				qty_dict.in_qty = qty_dict.in_qty + d.actual_qty
 			else:
-				qty_dict.out_qty = flt(qty_dict.out_qty, float_precision) \
-					+ abs(flt(d.actual_qty, float_precision))
+				qty_dict.out_qty = qty_dict.out_qty + abs(d.actual_qty)
 
-		qty_dict.bal_qty = flt(qty_dict.bal_qty, float_precision) + flt(d.actual_qty, float_precision)
+		qty_dict.bal_qty = qty_dict.bal_qty + d.actual_qty
 
 	return iwb_map
 
