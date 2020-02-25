@@ -1,5 +1,4 @@
 {
- "actions": [],
  "allow_import": 1,
  "allow_rename": 1,
  "autoname": "field:customer_group_name",
@@ -14,6 +13,7 @@
   "cb0",
   "default_price_list",
   "payment_terms",
+  "tax_category",
   "lft",
   "rgt",
   "old_parent",
@@ -133,12 +133,17 @@
    "fieldtype": "Table",
    "label": "Credit Limit",
    "options": "Customer Credit Limit"
+  },
+  {
+   "fieldname": "tax_category",
+   "fieldtype": "Link",
+   "label": "Tax Category",
+   "options": "Tax Category"
   }
  ],
  "icon": "fa fa-sitemap",
  "idx": 1,
- "links": [],
- "modified": "2020-01-28 13:49:23.961708",
+ "modified": "2020-02-25 11:34:38.051359",
  "modified_by": "Administrator",
  "module": "Setup",
  "name": "Customer Group",

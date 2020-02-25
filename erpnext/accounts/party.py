@@ -57,7 +57,8 @@ def _get_party_details(party=None, account=None, party_type="Customer", company=
 	set_other_values(party_details, party, party_type)
 	set_price_list(party_details, party, party_type, price_list, pos_profile)
 
-	party_details["tax_category"] = get_address_tax_category(party.get("tax_category"),
+	party_details["tax_category"] = get_party_tax_category(party)
+	party_details["tax_category"] = get_address_tax_category(party_details["tax_category"],
 		party_address, shipping_address if party_type != "Supplier" else party_address)
 
 	if not party_details.get("taxes_and_charges"):
@@ -380,6 +381,26 @@ def validate_due_date(posting_date, due_date, party_type, party, company=None, b
 			else:
 				frappe.throw(_("Due / Reference Date cannot be after {0}")
 					.format(formatdate(default_due_date)))
+
+def get_party_tax_category(party):
+	if party.get('tax_category'):
+		return party.get('tax_category')
+
+	party_group_type = party_group = parent_fieldname = None
+	if party.doctype == "Customer":
+		party_group_type = "Customer Group"
+		parent_fieldname = "parent_customer_group"
+		party_group = party.customer_group
+	elif party.doctype == "Supplier":
+		party_group_type = "Supplier Group"
+		parent_fieldname = "parent_supplier_group"
+		party_group = party.supplier_group
+
+	tax_category = None
+	while party_group and not tax_category:
+		tax_category, party_group = frappe.get_cached_value(party_group_type, party_group, ['tax_category', parent_fieldname])
+
+	return tax_category
 
 @frappe.whitelist()
 def get_address_tax_category(tax_category=None, billing_address=None, shipping_address=None):
