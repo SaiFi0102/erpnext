@@ -20,12 +20,16 @@ def get_data():
 				'items': ['Purchase Invoice', 'Purchase Receipt']
 			},
 			{
+				'label': _('Taxes'),
+				'items': ['Item', 'Tax Rule']
+			},
+			{
 				'label': _('Party'),
 				'items': ['Customer', 'Supplier']
 			},
 			{
-				'label': _('Taxes'),
-				'items': ['Item', 'Tax Rule']
+				'label': _('Group'),
+				'items': ['Customer Group', 'Supplier Group']
 			}
 		]
 	}

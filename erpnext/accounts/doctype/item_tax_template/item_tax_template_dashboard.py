@@ -20,7 +20,7 @@ def get_data():
 				'items': ['Purchase Invoice', 'Purchase Order', 'Purchase Receipt']
 			},
 			{
-				'items': ['Item']
+				'items': ['Item', 'Item Group']
 			}
 		]
 	}
