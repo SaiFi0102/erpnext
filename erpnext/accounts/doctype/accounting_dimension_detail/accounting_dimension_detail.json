@@ -8,7 +8,8 @@
   "reference_document",
   "default_dimension",
   "mandatory_for_bs",
-  "mandatory_for_pl"
+  "mandatory_for_pl",
+  "mandatory_for_tax"
  ],
  "fields": [
   {
@@ -36,7 +37,7 @@
    "options": "reference_document"
   },
   {
-   "columns": 3,
+   "columns": 2,
    "default": "0",
    "fieldname": "mandatory_for_bs",
    "fieldtype": "Check",
@@ -44,16 +45,24 @@
    "label": "Mandatory For Balance Sheet"
   },
   {
-   "columns": 3,
+   "columns": 2,
    "default": "0",
    "fieldname": "mandatory_for_pl",
    "fieldtype": "Check",
    "in_list_view": 1,
    "label": "Mandatory For Profit and Loss Account"
+  },
+  {
+   "columns": 2,
+   "default": "0",
+   "fieldname": "mandatory_for_tax",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Mandatory For Tax Account"
   }
  ],
  "istable": 1,
- "modified": "2019-08-15 11:59:09.389891",
+ "modified": "2020-02-25 14:20:36.440809",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Accounting Dimension Detail",

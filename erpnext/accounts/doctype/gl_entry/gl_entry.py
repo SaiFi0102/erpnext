@@ -100,6 +100,12 @@ class GLEntry(Document):
 					frappe.throw(_("Accounting Dimension <b>{0}</b> is required for 'Balance Sheet' account {1}.")
 						.format(dimension.label, self.account))
 
+			if account_type == "Tax" \
+				and self.company == dimension.company and dimension.mandatory_for_tax and not dimension.disabled:
+				if not self.get(dimension.fieldname):
+					frappe.throw(_("Accounting Dimension <b>{0}</b> is required for 'Tax' account {1}.")
+						.format(dimension.label, self.account))
+
 
 	def check_pl_account(self):
 		if self.is_opening=='Yes' and \
