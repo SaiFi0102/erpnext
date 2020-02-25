@@ -136,6 +136,7 @@
    "label": "Description"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "description",
    "fieldtype": "Text Editor",
    "label": "Description",
@@ -463,10 +464,8 @@
   {
    "fieldname": "target_warehouse",
    "fieldtype": "Link",
-   "hidden": 1,
    "ignore_user_permissions": 1,
    "label": "Customer Warehouse (Optional)",
-   "no_copy": 1,
    "options": "Warehouse",
    "print_hide": 1
   },
@@ -711,7 +710,7 @@
  ],
  "idx": 1,
  "istable": 1,
- "modified": "2019-09-20 15:09:22.184490",
+ "modified": "2020-02-21 20:40:11.366616",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Delivery Note Item",
