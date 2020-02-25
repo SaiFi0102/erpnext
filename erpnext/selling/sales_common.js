@@ -133,6 +133,7 @@ erpnext.selling.SellingController = erpnext.TransactionController.extend({
 		var me = this;
 		erpnext.utils.get_party_details(this.frm, null, null, function() {
 			me.apply_price_list();
+			me.tax_category();
 		});
 	},
 
