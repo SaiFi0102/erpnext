@@ -499,7 +499,7 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 							frappe.run_serially([
 								() => {
 									var d = locals[cdt][cdn];
-									me.add_taxes_from_item_tax_template(d.item_tax_rate);
+									me.add_taxes_from_item_tax_template(d.item_tax_rate, d.item_tax_template);
 									if (d.free_item_data) {
 										me.apply_product_discount(d.free_item_data);
 									}
@@ -528,7 +528,7 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 		}
 	},
 
-	add_taxes_from_item_tax_template: function(item_tax_map) {
+	add_taxes_from_item_tax_template: function(item_tax_map, item_tax_template) {
 		let me = this;
 
 		if(item_tax_map && cint(frappe.defaults.get_default("add_taxes_from_item_tax_template"))) {
@@ -536,13 +536,23 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 				item_tax_map = JSON.parse(item_tax_map);
 			}
 
+			var split_item_tax_templates = frappe.meta.has_field(frappe.meta.get_docfield(me.frm.doc.doctype, "taxes").options, "item_tax_template");
 			$.each(item_tax_map, function(tax, rate) {
-				let found = (me.frm.doc.taxes || []).find(d => d.account_head === tax);
+				let found;
+				if (split_item_tax_templates) {
+					found = (me.frm.doc.taxes || []).find(d => d.account_head === tax && d.item_tax_template == item_tax_template);
+				} else {
+					found = (me.frm.doc.taxes || []).find(d => d.account_head === tax);
+				}
 				if(!found) {
 					let child = frappe.model.add_child(me.frm.doc, "taxes");
 					child.charge_type = "On Net Total";
 					child.account_head = tax;
 					child.rate = 0;
+
+					if (split_item_tax_templates) {
+						child.item_tax_template = item_tax_template;
+					}
 				}
 			});
 		}
@@ -1523,7 +1533,7 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 				callback: function(r) {
 					if(!r.exc) {
 						item.item_tax_rate = r.message;
-						me.add_taxes_from_item_tax_template(item.item_tax_rate);
+						me.add_taxes_from_item_tax_template(item.item_tax_rate, item.item_tax_template);
 						me.calculate_taxes_and_totals();
 					}
 				}
@@ -1557,7 +1567,7 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 							if(item.item_code && r.message.hasOwnProperty(item.item_code)) {
 								item.item_tax_template = r.message[item.item_code].item_tax_template;
 								item.item_tax_rate = r.message[item.item_code].item_tax_rate;
-								me.add_taxes_from_item_tax_template(item.item_tax_rate);
+								me.add_taxes_from_item_tax_template(item.item_tax_rate, item.item_tax_template);
 							} else {
 								item.item_tax_template = "";
 								item.item_tax_rate = "{}";

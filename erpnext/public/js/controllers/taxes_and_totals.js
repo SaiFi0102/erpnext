@@ -159,7 +159,7 @@ erpnext.taxes_and_totals = erpnext.payments.extend({
 			var cumulated_tax_fraction = 0.0;
 
 			$.each(me.frm.doc["taxes"] || [], function(i, tax) {
-				tax.tax_fraction_for_current_item = me.get_current_tax_fraction(tax, item_tax_map);
+				tax.tax_fraction_for_current_item = me.get_current_tax_fraction(tax, item, item_tax_map);
 
 				if(i==0) {
 					tax.grand_total_fraction_for_current_item = 1 + tax.tax_fraction_for_current_item;
@@ -181,13 +181,13 @@ erpnext.taxes_and_totals = erpnext.payments.extend({
 		});
 	},
 
-	get_current_tax_fraction: function(tax, item_tax_map) {
+	get_current_tax_fraction: function(tax, item, item_tax_map) {
 		// Get tax fraction for calculating tax exclusive amount
 		// from tax inclusive amount
 		var current_tax_fraction = 0.0;
 
 		if(cint(tax.included_in_print_rate)) {
-			var tax_rate = this._get_tax_rate(tax, item_tax_map);
+			var tax_rate = this._get_tax_rate(tax, item, item_tax_map);
 
 			if(tax.charge_type == "On Net Total") {
 				current_tax_fraction = (tax_rate / 100.0);
@@ -208,7 +208,11 @@ erpnext.taxes_and_totals = erpnext.payments.extend({
 		return current_tax_fraction;
 	},
 
-	_get_tax_rate: function(tax, item_tax_map) {
+	_get_tax_rate: function(tax, item, item_tax_map) {
+		if (tax.item_tax_template && tax.item_tax_template != item.item_tax_template) {
+			return 0;
+		}
+
 		return (Object.keys(item_tax_map).indexOf(tax.account_head) != -1) ?
 			flt(item_tax_map[tax.account_head], precision("rate", tax)) : tax.rate;
 	},
@@ -326,7 +330,7 @@ erpnext.taxes_and_totals = erpnext.payments.extend({
 	},
 
 	get_current_tax_amount: function(item, tax, item_tax_map) {
-		var tax_rate = this._get_tax_rate(tax, item_tax_map);
+		var tax_rate = this._get_tax_rate(tax, item, item_tax_map);
 		var current_tax_amount = 0.0;
 
 		if(tax.charge_type == "Actual") {

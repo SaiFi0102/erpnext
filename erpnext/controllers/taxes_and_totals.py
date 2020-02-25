@@ -161,7 +161,7 @@ class calculate_taxes_and_totals(object):
 			item_tax_map = self._load_item_tax_rate(item.item_tax_rate)
 			cumulated_tax_fraction = 0
 			for i, tax in enumerate(self.doc.get("taxes")):
-				tax.tax_fraction_for_current_item = self.get_current_tax_fraction(tax, item_tax_map)
+				tax.tax_fraction_for_current_item = self.get_current_tax_fraction(tax, item, item_tax_map)
 
 				if i==0:
 					tax.grand_total_fraction_for_current_item = 1 + tax.tax_fraction_for_current_item
@@ -183,7 +183,7 @@ class calculate_taxes_and_totals(object):
 	def _load_item_tax_rate(self, item_tax_rate):
 		return json.loads(item_tax_rate) if item_tax_rate else {}
 
-	def get_current_tax_fraction(self, tax, item_tax_map):
+	def get_current_tax_fraction(self, tax, item, item_tax_map):
 		"""
 			Get tax fraction for calculating tax exclusive amount
 			from tax inclusive amount
@@ -191,7 +191,7 @@ class calculate_taxes_and_totals(object):
 		current_tax_fraction = 0
 
 		if cint(tax.included_in_print_rate):
-			tax_rate = self._get_tax_rate(tax, item_tax_map)
+			tax_rate = self._get_tax_rate(tax, item, item_tax_map)
 
 			if tax.charge_type == "On Net Total":
 				current_tax_fraction = tax_rate / 100.0
@@ -208,7 +208,10 @@ class calculate_taxes_and_totals(object):
 			current_tax_fraction *= -1.0 if (tax.add_deduct_tax == "Deduct") else 1.0
 		return current_tax_fraction
 
-	def _get_tax_rate(self, tax, item_tax_map):
+	def _get_tax_rate(self, tax, item, item_tax_map):
+		if tax.get('item_tax_template') and tax.get('item_tax_template') != item.get('item_tax_template'):
+			return 0
+
 		if tax.account_head in item_tax_map:
 			return flt(item_tax_map.get(tax.account_head), self.doc.precision("rate", tax))
 		else:
@@ -303,7 +306,7 @@ class calculate_taxes_and_totals(object):
 			tax.total = flt(self.doc.get("taxes")[row_idx-1].total + tax_amount, tax.precision("total"))
 
 	def get_current_tax_amount(self, item, tax, item_tax_map):
-		tax_rate = self._get_tax_rate(tax, item_tax_map)
+		tax_rate = self._get_tax_rate(tax, item, item_tax_map)
 		current_tax_amount = 0.0
 
 		if tax.charge_type == "Actual":
