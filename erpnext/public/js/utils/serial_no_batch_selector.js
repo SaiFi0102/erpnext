@@ -85,7 +85,6 @@ erpnext.SerialNoBatchSelector = Class.extend({
 				fieldtype:'Button',
 				label: __('Fetch based on FIFO'),
 				click: () => {
-<<<<<<< HEAD
 					if (me.has_batch) {
 						let qty = flt(this.dialog.fields_dict.qty.get_value());
 						frappe.call({
@@ -115,18 +114,6 @@ erpnext.SerialNoBatchSelector = Class.extend({
 								sales_order_item: me.item.so_detail
 							}
 						});
-=======
-					let qty = this.dialog.fields_dict.qty.get_value();
-					let numbers = frappe.call({
-						method: "erpnext.stock.doctype.serial_no.serial_no.auto_fetch_serial_number",
-						args: {
-							qty: qty,
-							item_code: me.item_code,
-							warehouse: me.warehouse_details.name,
-							batch_no: me.item.batch_no || null
-						}
-					});
->>>>>>> version-12-hotfix
 
 						numbers.then((data) => {
 							let auto_fetched_serial_numbers = data.message;
@@ -170,11 +157,7 @@ erpnext.SerialNoBatchSelector = Class.extend({
 				this.dialog.set_value('serial_no', d.serial_no);
 			}
 
-<<<<<<< HEAD
-			if (this.has_batch && d.batch_no) {
-=======
 			if (d.has_batch_no && d.batch_no) {
->>>>>>> version-12-hotfix
 				this.frm.doc.items.forEach(data => {
 					if(data.item_code == d.item_code) {
 						this.dialog.fields_dict.batches.df.data.push({
