@@ -267,6 +267,7 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 				ship_to: this.frm.doc.ship_to
 			}, function() {
 				me.apply_pricing_rule();
+				me.tax_category();
 			});
 
 		if(this.frm.doc.customer) {
