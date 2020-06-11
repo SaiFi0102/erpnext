@@ -4,19 +4,27 @@
 from __future__ import unicode_literals
 import frappe
 from frappe import _
-from frappe.utils import flt, today
+from frappe.utils import flt, cint, today
 from erpnext.stock.utils import update_included_uom_in_list_report
 
 def execute(filters=None):
 	filters = frappe._dict(filters or {})
 	include_uom = filters.get("include_uom")
-	columns = get_columns()
+	columns = get_columns(filters)
 	bin_list = get_bin_list(filters)
 	item_map = get_item_map(filters.get("item_code"), include_uom)
 
 	warehouse_company = {}
 	data = []
 	conversion_factors = []
+
+	filtered_item_groups = []
+	if filters.item_group:
+		item_group_lft_rgt = frappe.db.get_value("Item Group", filters.item_group, fieldname=['lft', 'rgt'])
+		if item_group_lft_rgt:
+			filtered_item_groups = frappe.db.sql_list("select name from `tabItem Group` where lft >= %s and rgt <= %s",
+				item_group_lft_rgt)
+
 	for bin in bin_list:
 		item = item_map.get(bin.item_code)
 
@@ -31,7 +39,7 @@ def execute(filters=None):
 		if filters.brand and filters.brand != item.brand:
 			continue
 			
-		elif filters.item_group and filters.item_group != item.item_group:
+		elif filters.item_group and item.item_group not in filtered_item_groups:
 			continue
 
 		elif filters.company and filters.company != company:
@@ -48,7 +56,12 @@ def execute(filters=None):
 
 		shortage_qty = re_order_level - flt(bin.projected_qty) if (re_order_level or re_order_qty) else 0
 
-		data.append([item.name, item.item_group, item.brand, bin.warehouse,
+		row = [item.name, item.item_group, item.brand]
+
+		if not cint(filters.get('consolidated')):
+			row.append(bin.warehouse)
+
+		row += [
 			item.alt_uom or item.stock_uom if filters.qty_field == "Contents Qty" else item.stock_uom,
 			bin.actual_qty * alt_uom_size,
 			bin.planned_qty * alt_uom_size,
@@ -61,7 +74,8 @@ def execute(filters=None):
 			re_order_level * alt_uom_size,
 			re_order_qty * alt_uom_size,
 			shortage_qty * alt_uom_size
-		])
+		]
+		data.append(row)
 
 		if include_uom:
 			conversion_factors.append(item.conversion_factor)
@@ -69,8 +83,8 @@ def execute(filters=None):
 	update_included_uom_in_list_report(columns, data, include_uom, conversion_factors)
 	return columns, data
 
-def get_columns():
-	return [
+def get_columns(filters):
+	columns = [
 		{"label": _("Item Code"), "fieldname": "item_code", "fieldtype": "Link", "options": "Item", "width": 150},
 		{"label": _("Item Group"), "fieldname": "item_group", "fieldtype": "Link", "options": "Item Group", "width": 100},
 		{"label": _("Brand"), "fieldname": "brand", "fieldtype": "Link", "options": "Brand", "width": 100},
@@ -91,6 +105,11 @@ def get_columns():
 		{"label": _("Shortage Qty"), "fieldname": "shortage_qty", "fieldtype": "Float", "width": 100, "convertible": "qty"}
 	]
 
+	if cint(filters.get('consolidated')):
+		columns = list(filter(lambda d: d.get('fieldname') != 'warehouse', columns))
+
+	return columns
+
 def get_bin_list(filters):
 	conditions = []
 	
@@ -105,10 +124,24 @@ def get_bin_list(filters):
 				where wh.lft >= %s and wh.rgt <= %s and bin.warehouse = wh.name)"%(warehouse_details.lft,
 				warehouse_details.rgt))
 
-	bin_list = frappe.db.sql("""select item_code, warehouse, actual_qty, planned_qty, indented_qty,
-		ordered_qty, reserved_qty, reserved_qty_for_production, reserved_qty_for_sub_contract, projected_qty
-		from tabBin bin {conditions} order by item_code, warehouse
-		""".format(conditions=" where " + " and ".join(conditions) if conditions else ""), as_dict=1)
+	if cint(filters.get('consolidated')):
+		group_fields = "item_code"
+	else:
+		group_fields = "item_code, warehouse"
+
+	bin_list = frappe.db.sql("""
+		select 
+			item_code, warehouse,
+			sum(actual_qty) as actual_qty, sum(planned_qty) as planned_qty, sum(indented_qty) as indented_qty,
+			sum(ordered_qty) as ordered_qty, sum(reserved_qty) as reserved_qty,
+			sum(reserved_qty_for_production) as reserved_qty_for_production,
+			sum(reserved_qty_for_sub_contract) as reserved_qty_for_sub_contract,
+			sum(projected_qty) as projected_qty
+		from tabBin bin
+		{conditions}
+		group by {group_fields}
+		order by {group_fields}
+	""".format(conditions=" where " + " and ".join(conditions) if conditions else "", group_fields=group_fields), as_dict=1)
 
 	return bin_list
 

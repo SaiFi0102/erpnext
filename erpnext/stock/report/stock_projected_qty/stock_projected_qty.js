@@ -51,6 +51,11 @@ frappe.query_reports["Stock Projected Qty"] = {
 			"label": __("Include UOM"),
 			"fieldtype": "Link",
 			"options": "UOM"
-		}
+		},
+		{
+			"fieldname": "consolidated",
+			"label": __("Consolidated Values"),
+			"fieldtype": "Check"
+		},
 	]
 }
