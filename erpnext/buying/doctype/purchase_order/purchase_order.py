@@ -93,6 +93,8 @@ class PurchaseOrder(BuyingController):
 			doc.calculate_taxes_and_totals()
 			doc.save()
 
+
+
 	def before_print(self):
 		super(PurchaseOrder, self).before_print()
 
@@ -622,3 +624,28 @@ def update_status(status, name):
 def make_inter_company_sales_order(source_name, target_doc=None):
 	from erpnext.accounts.doctype.sales_invoice.sales_invoice import make_inter_company_transaction
 	return make_inter_company_transaction("Purchase Order", source_name, target_doc)
+
+@frappe.whitelist()
+def get_customs_exchange_rate(from_currency, to_currency, transaction_date=None):
+	import requests 
+
+	if not transaction_date:
+		transaction_date = frappe.utils.today()
+
+	try:
+		cache = frappe.cache()
+		key = "bank_of_canada_FX{0}:{1}:{2}".format(from_currency, to_currency, transaction_date)
+		value = flt(cache.get(key))
+		if not value:
+			url = "https://www.bankofcanada.ca/valet/observations/FX{0}{1}?start_date={2}&end_date={2}".format(from_currency, to_currency, transaction_date)
+
+			data = requests.get(url).json()
+			observation = data["observations"][0]
+			value = flt(observation["FX{0}{1}".format(from_currency, to_currency)]["v"])
+			cache.setex(key, value, 6 * 60 * 60)
+	except:
+		frappe.log_error(title="Get Exchange Rate")
+		frappe.msgprint(_("Unable to find exchange rate for {0} to {1} for key date {2}. Please set a Currency Exchange manually").format(from_currency, to_currency, transaction_date))
+		return 0.0
+
+	return value
