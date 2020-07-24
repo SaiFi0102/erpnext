@@ -756,3 +756,14 @@ frappe.ui.form.on("Purchase Order", "get_customs_exchange_rate", function (frm) 
 		}
 	}
 });
+
+frappe.ui.form.on("Purchase Order", "get_b3_transaction_number", function (frm) {
+	frappe.call({
+		method: "erpnext.buying.doctype.purchase_order.purchase_order.generate_b3_transaction_no",
+		args: {'company': frm.doc.company},
+		callback: function (r) {
+			if (r.message)
+				frm.set_value("b3_transaction_no", r.message);
+		}
+	});
+});

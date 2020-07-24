@@ -13,8 +13,8 @@
   "supplier_name",
   "shipping_date",
   "schedule_date",
-  "actual_gross_weight",
   "get_items_from_open_material_requests",
+  "actual_gross_weight",
   "order_confirmation_no",
   "order_confirmation_date",
   "column_break1",
@@ -37,7 +37,6 @@
   "amended_from",
   "b3_information_section",
   "b3_transaction_no",
-  "get_b3_transaction_number",
   "column_break_38",
   "carrier_code",
   "airway_bill_no",
@@ -1120,8 +1119,7 @@
   {
    "fieldname": "pickup_no",
    "fieldtype": "Data",
-   "label": "Pickup #",
-   "no_copy": 1
+   "label": "Pickup #"
   },
   {
    "fieldname": "empty_pallet_weight",
@@ -1131,8 +1129,7 @@
   {
    "fieldname": "note",
    "fieldtype": "Data",
-   "label": "Note",
-   "no_copy": 1
+   "label": "Note"
   },
   {
    "fieldname": "column_break_16",
@@ -1161,14 +1158,12 @@
    "fieldtype": "Float",
    "hidden": 1,
    "label": "Actual # Of Pallets For Pick Up",
-   "no_copy": 1,
    "read_only": 1
   },
   {
    "fieldname": "total_packed_pallets",
    "fieldtype": "Float",
-   "label": "Actual # Of Pallets For Pick Up",
-   "no_copy": 1
+   "label": "Actual # Of Pallets For Pick Up"
   },
   {
    "fieldname": "column_break_14",
@@ -1444,11 +1439,11 @@
    "fieldtype": "Column Break"
   },
   {
+<<<<<<< HEAD
    "fieldname": "get_customs_exchange_rate",
    "fieldtype": "Button",
    "label": "Get Customs Exchange Rate"
-  },
-  {
+=======
    "fieldname": "column_break_38",
    "fieldtype": "Column Break"
   },
@@ -1457,17 +1452,17 @@
    "fieldtype": "Barcode",
    "label": "B3 Transaction Number",
    "options": "{\"format\": \"CODE128\", \"height\": 40, \"displayValue\": false}"
-  },
-  {
-   "fieldname": "get_b3_transaction_number",
-   "fieldtype": "Button",
-   "label": "Get B3 Transaction Number"
+>>>>>>> 68ca05de4f0bc5c10159a70956582995c997e27f
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 105,
  "is_submittable": 1,
- "modified": "2020-07-24 15:45:51.840689",
+<<<<<<< HEAD
+ "modified": "2020-07-23 18:23:40.073717",
+=======
+ "modified": "2020-07-24 05:06:22.307236",
+>>>>>>> 68ca05de4f0bc5c10159a70956582995c997e27f
  "modified_by": "Administrator",
  "module": "Buying",
  "name": "Purchase Order",
