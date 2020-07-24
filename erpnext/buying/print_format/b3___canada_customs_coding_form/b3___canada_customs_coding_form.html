@@ -46,9 +46,14 @@ Please set HS Codes and reload this print format.
 						<p class="formlabel">
 							2. TRANSACTION NO. - N° DE TRANSACTION
 						</p>
-						<p class="formdata" style="min-height: 50px;">
-							<br>
-						</p>
+						<div class="clearfix">
+							<div class="pull-left" style="margin-top: 20px;">
+								<p style="text-align: left;">{{ doc.b3_transaction_no_formatted or '' }}</p>
+							</div>
+							<div class="pull-right">
+								<p style="text-align: left;">{{ doc.b3_transaction_no or '' }}</p>
+							</div>
+						</div>
 					</td>
 				</tr>
 
@@ -214,9 +219,9 @@ Please set HS Codes and reload this print format.
 					</td>
 					<td class="curr" colspan="8">
 						<p class="formlabel" style="text-align: center;">Currency Rate</p>
-						<div class="formdata"
-							style="border: 1px solid black; height: 20px; width: 95%; margin: auto;">
-							<p class="formdata" style="text-align: center;">{{ doc.get_formatted('customs_exchange_rate') }}</p>
+						<div class="formdata" style="border: 1px solid black; height: 20px; width: 95%; margin: auto;">
+							<p class="formdata" style="text-align: center;">
+								{{ doc.get_formatted('customs_exchange_rate') }}</p>
 						</div>
 					</td>
 					<td colspan="8">
@@ -242,7 +247,7 @@ Please set HS Codes and reload this print format.
 							<p class="formlabel">21 LINE <br> LIGNE</p>
 							<p class="formdata">{{ loop.index  }}</p>
 						</td>
-						<td style="width:32.05%; border-bottom: 0;"  colspan="25">
+						<td style="width:32.05%; border-bottom: 0;" colspan="25">
 							<p class="formlabel">22 DESCRIPTION <br> DÉSIGNATION</p>
 							<p class="formdata">{{ row.description}}</p>
 						</td>
@@ -379,8 +384,10 @@ Please set HS Codes and reload this print format.
 									style="margin-left: 50px; font-size: 10px !important;">SUNDINE PRODUCE INC.
 									905-364-1600</span></span></span>
 					</p>
-					<p style="text-align: center; font-size: 6px; margin-top: 5px !important;">IMPORTER / AGENT - IMPORTATEUR / AGENT</p>
-					<p style="font-size: 6px; margin-top: 5px !important;">DECLARE THE PARTICULARS OF THIS DOCUMENT TO BE TRUE,
+					<p style="text-align: center; font-size: 6px; margin-top: 5px !important;">IMPORTER / AGENT -
+						IMPORTATEUR / AGENT</p>
+					<p style="font-size: 6px; margin-top: 5px !important;">DECLARE THE PARTICULARS OF THIS DOCUMENT TO
+						BE TRUE,
 						ACCURATE AND COMPLETE. DÉCLARE QUE LES RENSEIGNEMENTS CI-DESSUS SONT VRAIS ET COMPLETS.
 					</p>
 					<br>

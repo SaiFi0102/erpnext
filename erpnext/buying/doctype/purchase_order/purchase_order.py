@@ -81,8 +81,7 @@ class PurchaseOrder(BuyingController):
 				frappe.throw(_("Airway Bill No must be in the format ####-####"))
 
 		if self.b3_transaction_no:
-			b3_transaction_no = re.search('data-barcode-value="(.*?)"', self.b3_transaction_no)
-			b3_transaction_no = b3_transaction_no.group(1)
+			b3_transaction_no = self.get_b3_transaction_no()
 			if len(b3_transaction_no) != 14 or not b3_transaction_no.isdecimal():
 				frappe.throw(_("B3 Transaction Number must be 14 digits long"))
 
@@ -90,6 +89,14 @@ class PurchaseOrder(BuyingController):
 			if check_digit != b3_transaction_no[13]:
 				frappe.throw(_("Invalid B3 Transaction Number Check Digit"))
 
+	def get_b3_transaction_no(self):
+		import re
+		if not self.b3_transaction_no:
+			return ""
+		else:
+			b3_transaction_no = re.search('data-barcode-value="(.*?)"', self.b3_transaction_no)
+			b3_transaction_no = b3_transaction_no.group(1)
+			return b3_transaction_no
 	
 	def update_lcv_values(self):
 		lcvs_to_update = frappe.db.sql_list("""
@@ -112,7 +119,13 @@ class PurchaseOrder(BuyingController):
 		self.items_by_hs_code = {}
 		self.items_without_hs_code = [d for d in self.items if not frappe.get_cached_value('Item', d.item_code, 'customs_tariff_number')]
 
-		
+		self.b3_transaction_no_value = self.get_b3_transaction_no()
+
+		if self.b3_transaction_no_value:
+			self.b3_transaction_no_formatted = self.b3_transaction_no_value[0:5] + "-" + self.b3_transaction_no_value[5:] + " / " + self.company
+		else:
+			self.b3_transaction_no_formatted = ""
+
 		add_fields = ["qty", "amount"]
 		empty_dict = frappe._dict()
 		empty_dict['net_weight'] = 0
