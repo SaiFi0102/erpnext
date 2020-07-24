@@ -73,12 +73,23 @@ class PurchaseOrder(BuyingController):
 	def validate_b3_information(self):
 		import re
 		if self.carrier_code:
-			if len(self.carrier_code) != 3:
+			if len(self.carrier_code) != 3 or not self.carrier_code.isdecimal():
 				frappe.throw(_("Carrier Code must be 3 digits long"))
 		
 		if self.airway_bill_no:
 			if len(self.airway_bill_no) != 9 or not re.search("[0-9]{4}-[0-9]{4}", self.airway_bill_no):
 				frappe.throw(_("Airway Bill No must be in the format ####-####"))
+
+		if self.b3_transaction_no:
+			b3_transaction_no = re.search('data-barcode-value="(.*?)"', self.b3_transaction_no)
+			b3_transaction_no = b3_transaction_no.group(1)
+			if len(b3_transaction_no) != 14 or not b3_transaction_no.isdecimal():
+				frappe.throw(_("B3 Transaction Number must be 14 digits long"))
+
+			check_digit = cstr(calculate_b3_transaction_no_check_digit(b3_transaction_no[:13]))
+			if check_digit != b3_transaction_no[13]:
+				frappe.throw(_("Invalid B3 Transaction Number Check Digit"))
+
 	
 	def update_lcv_values(self):
 		lcvs_to_update = frappe.db.sql_list("""
@@ -613,6 +624,41 @@ def get_list_context(context=None):
 		'title': _('Purchase Orders'),
 	})
 	return list_context
+
+@frappe.whitelist()
+def generate_b3_transaction_no(company):
+	from frappe.model.naming import make_autoname
+
+	asec_security_number = frappe.get_cached_value("Company", company, "asec_security_number")
+	if not asec_security_number:
+		frappe.throw(_("Please set Account Security Number (ASEC) for company {0}").format(company))
+
+	series = "{0}.########".format(asec_security_number)
+	b3_transaction_no = make_autoname(series, "Purchase Order")
+	check_digit = calculate_b3_transaction_no_check_digit(b3_transaction_no)
+
+	return "{0}{1}".format(b3_transaction_no, check_digit)
+
+def calculate_b3_transaction_no_check_digit(b3_transaction_no):
+	if len(b3_transaction_no) != 13 or not b3_transaction_no.isdecimal():
+		frappe.throw(_("Invalid B3 Transaction Number"))
+
+	D = []
+	for i, char in enumerate(b3_transaction_no):
+		a = int(char)
+		b = 1 if i % 2 == 0 else 2
+		c = a * b
+
+		lft = c // 10
+		rgt = c % 10
+		d = lft + rgt
+
+		D.append(d)
+
+	E = sum(D)
+	F = E % 10
+	return F
+
 
 @frappe.whitelist()
 def update_status(status, name):

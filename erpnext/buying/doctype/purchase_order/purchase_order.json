@@ -36,6 +36,8 @@
   "conversion_rate",
   "amended_from",
   "b3_information_section",
+  "b3_transaction_no",
+  "column_break_38",
   "carrier_code",
   "airway_bill_no",
   "column_break_33",
@@ -1117,7 +1119,8 @@
   {
    "fieldname": "pickup_no",
    "fieldtype": "Data",
-   "label": "Pickup #"
+   "label": "Pickup #",
+   "no_copy": 1
   },
   {
    "fieldname": "empty_pallet_weight",
@@ -1127,7 +1130,8 @@
   {
    "fieldname": "note",
    "fieldtype": "Data",
-   "label": "Note"
+   "label": "Note",
+   "no_copy": 1
   },
   {
    "fieldname": "column_break_16",
@@ -1156,12 +1160,14 @@
    "fieldtype": "Float",
    "hidden": 1,
    "label": "Actual # Of Pallets For Pick Up",
+   "no_copy": 1,
    "read_only": 1
   },
   {
    "fieldname": "total_packed_pallets",
    "fieldtype": "Float",
-   "label": "Actual # Of Pallets For Pick Up"
+   "label": "Actual # Of Pallets For Pick Up",
+   "no_copy": 1
   },
   {
    "fieldname": "column_break_14",
@@ -1396,6 +1402,7 @@
   },
   {
    "collapsible": 1,
+   "collapsible_depends_on": "b3_document_number",
    "fieldname": "b3_information_section",
    "fieldtype": "Section Break",
    "label": "B3 Information"
@@ -1439,12 +1446,22 @@
    "fieldname": "get_customs_exchange_rate",
    "fieldtype": "Button",
    "label": "Get Customs Exchange Rate"
+  },
+  {
+   "fieldname": "column_break_38",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "b3_transaction_no",
+   "fieldtype": "Barcode",
+   "label": "B3 Transaction Number",
+   "options": "{\"format\": \"CODE128\", \"height\": 40, \"displayValue\": false}"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 105,
  "is_submittable": 1,
- "modified": "2020-07-23 18:23:40.073717",
+ "modified": "2020-07-24 05:06:22.307236",
  "modified_by": "Administrator",
  "module": "Buying",
  "name": "Purchase Order",

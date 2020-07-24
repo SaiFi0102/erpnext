@@ -47,6 +47,7 @@ class Company(NestedSet):
 		self.validate_perpetual_inventory()
 		self.check_country_change()
 		self.set_chart_of_accounts()
+		self.validate_asec_security_number()
 
 	def validate_abbr(self):
 		if not self.abbr:
@@ -189,6 +190,11 @@ class Company(NestedSet):
 		if self.parent_company:
 			self.create_chart_of_accounts_based_on = "Existing Company"
 			self.existing_company = self.parent_company
+
+	def validate_asec_security_number(self):
+		if self.asec_security_number:
+			if len(self.asec_security_number) != 5 or not self.asec_security_number.isdecimal():
+				frappe.throw(_("Account Security Number (ASEC) must be 5 digits long"))
 
 	def set_default_accounts(self):
 		default_accounts = {
