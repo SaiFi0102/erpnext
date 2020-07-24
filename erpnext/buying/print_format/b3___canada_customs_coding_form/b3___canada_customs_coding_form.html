@@ -1,3 +1,10 @@
+{% if not doc.customs_exchange_rate %}
+<h3>Customs exchange rate is not set, please define customs exchange rate:</h3>
+
+{% else %}
+{#{ doc.customs_exchange_rate }#}
+
+
 {% if doc.items_without_hs_code %}
 <h3>The following item(s) do not have HS Code set:</h3>
 <ol>
@@ -211,13 +218,6 @@ Please set HS Codes and reload this print format.
 							style="border: 1px solid black; height: 20px; width: 95%; margin: auto;">
 							<p class="formdata" style="text-align: center;">{{ doc.get_formatted('customs_exchange_rate') }}</p>
 						</div>
-						<!-- <table style="width:80%; height: 50%;" class="curr1">
-							<tr>
-								<td>
-									<p style="text-align: center;">{{ doc.get_formatted('customs_exchange_rate') }}</p>
-								</td>
-							</tr>
-						</table> -->
 					</td>
 					<td colspan="8">
 						<p class="formlabel">20 RELEASE DATE - DATE DE LA MAINLEVÉE</p>
@@ -462,4 +462,5 @@ Please set HS Codes and reload this print format.
 		</div>
 	</div>
 </div>
+{% endif %}
 {% endif %}

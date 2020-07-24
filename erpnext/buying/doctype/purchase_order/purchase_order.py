@@ -632,6 +632,8 @@ def get_customs_exchange_rate(from_currency, to_currency, transaction_date=None)
 	if not transaction_date:
 		transaction_date = frappe.utils.today()
 
+	transaction_date = frappe.utils.add_days(transaction_date, -1)
+
 	try:
 		cache = frappe.cache()
 		key = "bank_of_canada_FX{0}:{1}:{2}".format(from_currency, to_currency, transaction_date)

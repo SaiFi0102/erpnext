@@ -742,16 +742,17 @@ frappe.ui.form.on("Purchase Order", "get_customs_exchange_rate", function (frm) 
 	var company_currency = frm.cscript.get_company_currency();
 
 	if (frm.doc.currency) {
-		frappe.call({
-			
-			method: "erpnext.buying.doctype.purchase_order.purchase_order.get_customs_exchange_rate",
-			args: { 'from_currency': company_currency, 'to_currency': frm.doc.currency },
-			//args: { 'from_currency': 'CAD', 'to_currency': 'USD', 'transaction_date': '2020-07-21'},
-			callback: function (r) {
-				if (r.message)
-					frm.set_value("customs_exchange_rate", r.message);
-			}
-			
-		})
+		if (frm.doc.currency == company_currency) {
+			frm.set_value("customs_exchange_rate", 1.0);
+		} else {
+			frappe.call({
+				method: "erpnext.buying.doctype.purchase_order.purchase_order.get_customs_exchange_rate",
+				args: {'from_currency': company_currency , 'to_currency': frm.doc.currency},
+				callback: function (r) {
+					if (r.message)
+						frm.set_value("customs_exchange_rate", r.message);
+				}
+			});
+		}
 	}
 });
