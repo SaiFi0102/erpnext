@@ -430,16 +430,18 @@ class GrossProfitGenerator(object):
 
 
 def update_item_batch_incoming_rate(items, doc=None, po_from_date=None, po_to_date=None):
+	from frappe.model.document import Document
+
 	if not doc:
 		doc = frappe._dict()
 
 	args = items
 	if doc:
 		args = []
-		doc_dict = doc.as_dict()
+		doc_dict = doc.as_dict() if isinstance(doc, Document) else doc
 		for d in items:
 			cur_arg = doc_dict.copy()
-			cur_arg.update(d.as_dict())
+			cur_arg.update(d.as_dict() if isinstance(d, Document) else d)
 			args.append(d)
 
 	incoming_rate_data = get_item_incoming_rate_data(args,
