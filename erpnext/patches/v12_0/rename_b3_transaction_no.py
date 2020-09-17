@@ -8,7 +8,7 @@ def execute():
 	po_to_b3_barcode = dict(frappe.db.sql("""
 		select name, b3_transaction_no
 		from `tabPurchase Order`
-		where docstatus = 1 and ifnull(b3_transaction_no, '') != ''
+		where ifnull(b3_transaction_no, '') != ''
 	"""))
 
 	for po_name, barcode in po_to_b3_barcode.items():
