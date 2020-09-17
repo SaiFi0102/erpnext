@@ -429,25 +429,81 @@ class GrossProfitGenerator(object):
 
 
 
-def update_item_batch_incoming_rate(items, po_from_date=None, po_to_date=None):
-	incoming_rate_data = get_item_incoming_rate_data(items, po_from_date=po_from_date, po_to_date=po_to_date)
+def update_item_batch_incoming_rate(items, doc=None, po_from_date=None, po_to_date=None):
+	if not doc:
+		doc = frappe._dict()
 
-	for d in items:
-		if d.get('item_code') or d.get('batch_no'):
-			batch_or_item = 'batch_incoming_rate' if d.get('batch_no') else 'item_valuation_rate'
-			d.valuation_rate = flt(incoming_rate_data[batch_or_item].get(d.get('batch_no') or d.get('item_code')))
+	args = items
+	if doc:
+		args = []
+		doc_dict = doc.as_dict()
+		for d in items:
+			cur_arg = doc_dict.copy()
+			cur_arg.update(d.as_dict())
+			args.append(d)
+
+	incoming_rate_data = get_item_incoming_rate_data(args,
+		po_from_date=po_from_date or doc.get('po_cost_from_date'),
+		po_to_date=po_to_date or doc.get('po_cost_to_date'))
+
+	for i, d in enumerate(items):
+		source_info = incoming_rate_data.source_map.get(i)
+		if source_info:
+			source_type, source_key = source_info
+			source_object = incoming_rate_data.get(source_type)
+
+			if source_object:
+				d.valuation_rate = flt(source_object.get(source_key))
+			else:
+				d.valuation_rate = 0
+		else:
+			d.valuation_rate = 0
 
 
-def get_item_incoming_rate_data(items, po_from_date=None, po_to_date=None):
-	if isinstance(items, string_types):
-		items = json.loads(items)
+def get_item_incoming_rate_data(args, po_from_date=None, po_to_date=None):
+	"""
+	args list:
+		'dt' or 'parenttype' or 'doctype'
+		'child_docname' or 'name'
+		'doc_status' or 'docstatus'
+		'item_code'
+		'batch_no'
+		'update_stock'
+		'dn_detail'
+	"""
 
-	item_codes = list(set([d.get('item_code') for d in items if d.get('item_code') and not d.get('batch_no')]))
-	batch_nos = list(set([d.get('batch_no') for d in items if d.get('batch_no')]))
+	source_map = {}
+
+	for i, d in enumerate(args):
+		parent_doctype = d.get('dt') or d.get('parenttype') or d.get('doctype')
+		row_name = d.get('child_docname') or d.get('name')
+		docstatus = d.get('doc_status') or d.get('docstatus')
+
+		if d.get('batch_no'):
+			source_map[i] = ('batch_incoming_rate', d.get('batch_no'))
+		elif parent_doctype in ('Sales Invoice', 'Delivery Note'):
+			if d.get('dn_detail') and parent_doctype == "Sales Invoice":
+				voucher_detail_no = ('Delivery Note', d.get('dn_detail'))
+				source_map[i] = ('sle_outgoing_rate', voucher_detail_no)
+			elif docstatus == 1:
+				if row_name and (parent_doctype == "Delivery Note" or d.get('update_stock')):
+					voucher_detail_no = (parent_doctype, row_name)
+					source_map[i] = ('sle_outgoing_rate', voucher_detail_no)
+			else:
+				# get_incoming_rate
+				source_map[i] = (None, None)
+		elif d.get('item_code'):
+			source_map[i] = ('item_valuation_rate', d.get('item_code'))
+
+	item_codes = list(set([key for obj, key in source_map.values() if obj == 'item_valuation_rate']))
+	batch_nos = list(set([key for obj, key in source_map.values() if obj == 'batch_incoming_rate']))
+	voucher_detail_nos = [key for obj, key in source_map.values() if obj == 'sle_outgoing_rate']
 
 	out = frappe._dict()
 	out.batch_incoming_rate = get_batch_incoming_rate(batch_nos)
 	out.item_valuation_rate = get_item_valuation_rate(item_codes, po_from_date, po_to_date)
+	out.sle_outgoing_rate = get_sle_outgoing_rate(voucher_detail_nos)
+	out.source_map = source_map
 	return out
 
 
@@ -575,5 +631,27 @@ def get_batch_incoming_rate(batch_nos):
 	for batch_no in batch_nos:
 		batch_incoming_value = batch_to_incoming_values.get(batch_no, frappe._dict())
 		out[batch_no] = batch_incoming_value.cost / batch_incoming_value.qty if batch_incoming_value else 0
+
+	return out
+
+def get_sle_outgoing_rate(voucher_detail_nos):
+	if not voucher_detail_nos:
+		return
+
+	values = []
+	for voucher_type, voucher_detail_no in voucher_detail_nos:
+		values.append(voucher_type)
+		values.append(voucher_detail_no)
+
+	res = frappe.db.sql("""
+		select sum(stock_value_difference) / sum(actual_qty) as outgoing_rate, voucher_type, voucher_detail_no
+		from `tabStock Ledger Entry`
+		where (voucher_type, voucher_detail_no) in ({0})
+		group by voucher_type, voucher_detail_no
+	""".format(", ".join(["(%s, %s)"] * len(voucher_detail_nos))), voucher_detail_nos, as_dict=1)
+
+	out = {}
+	for d in res:
+		out[(d.voucher_type, d.voucher_detail_no)] = d.outgoing_rate
 
 	return out

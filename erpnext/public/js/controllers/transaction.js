@@ -1620,10 +1620,12 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 					"parent": d.parent,
 					"pricing_rules": d.pricing_rules,
 					"warehouse": d.warehouse,
+					"batch_no": d.batch_no,
 					"serial_no": d.serial_no,
 					"price_list_rate": d.price_list_rate,
 					"discount_percentage": d.discount_percentage || 0.0,
 					"conversion_factor": d.conversion_factor || 1.0,
+					"dn_detail": d.dn_detail,
 					"ignore_pricing_rule": cint(d.override_price_list_rate || me.frm.doc.ignore_pricing_rule)
 				});
 

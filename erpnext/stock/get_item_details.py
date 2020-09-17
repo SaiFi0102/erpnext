@@ -142,9 +142,7 @@ def set_valuation_rate(out, args):
 		bundled_items = frappe.get_doc("Product Bundle", args.item_code)
 
 		for bundle_item in bundled_items.items:
-			valuation_rate += flt(get_valuation_rate(bundle_item.item_code, batch_no=args.get('batch_no'),
-				company=args.company, warehouse=out.get("warehouse"),
-				from_date=args.get('po_cost_from_date'), to_date=args.get('po_cost_to_date'))\
+			valuation_rate += flt(get_valuation_rate(args, bundle_item.item_code)\
 					.get("valuation_rate") * bundle_item.qty)
 
 		out.update({
@@ -152,9 +150,7 @@ def set_valuation_rate(out, args):
 		})
 
 	else:
-		out.update(get_valuation_rate(args.item_code, batch_no=args.get('batch_no'),
-			company=args.company, warehouse=out.get("warehouse"),
-			from_date=args.get('po_cost_from_date'), to_date=args.get('po_cost_to_date')))
+		out.update(get_valuation_rate(args))
 
 
 def process_args(args):
@@ -1099,27 +1095,18 @@ def get_default_bom(item_code=None):
 			return bom
 
 @frappe.whitelist()
-def get_valuation_rate(item_code, company=None, warehouse=None, from_date=None, to_date=None, batch_no=None):
-	empty = {"valuation_rate": 0.0}
+def get_valuation_rate(args, item_code=None):
+	if isinstance(args, string_types):
+		args = json.loads(args)
 
-	from erpnext.accounts.report.gross_profit.gross_profit import get_item_incoming_rate_data
-	item = frappe.get_cached_doc("Item", item_code)
+	args = frappe._dict(args)
 
-	if item.get("is_stock_item"):
-		args = [{'item_code': item_code, 'batch_no': batch_no}]
-		incoming_rate_data = get_item_incoming_rate_data(args, po_from_date=from_date, po_to_date=to_date)
-		batch_or_item = 'batch_incoming_rate' if batch_no else 'item_valuation_rate'
-		return {"valuation_rate": flt(incoming_rate_data[batch_or_item].get(batch_no or item_code))}
+	from erpnext.accounts.report.gross_profit.gross_profit import update_item_batch_incoming_rate
+	if item_code:
+		args['item_code'] = item_code
 
-	elif not item.get("is_stock_item"):
-		valuation_rate = frappe.db.sql("""select sum(base_net_amount) / sum(stock_qty)
-			from `tabPurchase Invoice Item`
-			where item_code = %s and docstatus=1""", item_code)
-
-		if valuation_rate:
-			return {"valuation_rate": valuation_rate[0][0] or 0.0}
-	else:
-		return empty
+	update_item_batch_incoming_rate([args])
+	return {"valuation_rate": flt(args.get('valuation_rate'))}
 
 def get_gross_profit(out):
 	if out.valuation_rate:

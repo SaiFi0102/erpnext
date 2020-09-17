@@ -578,27 +578,33 @@ Customer Request`}
 		}
 	},
 
-	batch_no: function(doc, cdt, cdn) {
+	get_valuation_rate: function(item_doc) {
 		var me = this;
-		var item = frappe.get_doc(cdt, cdn);
+		if (item_doc && me.can_get_gross_profit()) {
+			var args = me._get_args(item_doc);
+			args = Object.assign(args, args.items[0]);
+			delete args['items'];
 
-		if (item && me.can_get_gross_profit()) {
 			frappe.call({
 				method: "erpnext.stock.get_item_details.get_valuation_rate",
 				args: {
-					"item_code": item.item_code,
-					"batch_no": item.batch_no,
-					"company": me.frm.doc.company,
-					"warehouse": item.warehouse,
+					args
 				},
 				callback: function(r) {
 					if(r.message) {
-						item.valuation_rate = flt(r.message.valuation_rate);
-						me.calculate_taxes_and_totals();
+						item_doc.valuation_rate = flt(r.message.valuation_rate);
+						me.calculate_gross_profit();
+						me.frm.refresh_fields();
 					}
 				}
 			});
 		}
+	},
+
+	batch_no: function(doc, cdt, cdn) {
+		var item = frappe.get_doc(cdt, cdn);
+
+		this.get_valuation_rate(item);
 
 		item.serial_no = null;
 		var has_serial_no;

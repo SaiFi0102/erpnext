@@ -137,7 +137,7 @@ def get_sales_orders_for_qty_adjust(item_code, from_date, to_date=None, sort_by=
 
 def update_gross_profit_on_sales_orders(so_data, from_date, to_date):
 	from erpnext.accounts.report.gross_profit.gross_profit import update_item_batch_incoming_rate
-	update_item_batch_incoming_rate(so_data, from_date, to_date)
+	update_item_batch_incoming_rate(so_data, po_from_date=from_date, po_to_date=to_date)
 
 	for d in so_data:
 		d.cogs_per_unit = flt(d.valuation_rate) * flt(d.conversion_factor)
