@@ -85,7 +85,7 @@ class SellingController(StockController):
 			if self.docstatus == 0:
 				self.set_po_cost_from_date()
 
-			update_item_batch_incoming_rate(self.items, from_date=self.get('po_cost_from_date'), to_date=self.get('po_cost_to_date'))
+			update_item_batch_incoming_rate(self.items, po_from_date=self.get('po_cost_from_date'), po_to_date=self.get('po_cost_to_date'))
 			self.calculate_taxes_and_totals()
 
 	def set_po_cost_from_date(self, force=0):

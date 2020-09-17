@@ -429,12 +429,12 @@ class GrossProfitGenerator(object):
 
 
 
-def update_item_batch_incoming_rate(items, from_date=None, to_date=None):
-	incoming_rate_data = get_sales_item_batch_incoming_rate(items, from_date=from_date, to_date=to_date)
+def update_item_batch_incoming_rate(items, po_from_date=None, po_to_date=None):
+	incoming_rate_data = get_sales_item_batch_incoming_rate(items, po_from_date=po_from_date, po_to_date=po_to_date)
 
 	for d in items:
 		if d.get('item_code') or d.get('batch_no'):
-			batch_or_item = 'batch_incoming_rate' if d.get('batch_no') else 'item_incoming_rate'
+			batch_or_item = 'batch_incoming_rate' if d.get('batch_no') else 'item_valuation_rate'
 			d.valuation_rate = flt(incoming_rate_data[batch_or_item].get(d.get('batch_no') or d.get('item_code')))
 
 
@@ -445,13 +445,13 @@ def get_sales_item_batch_incoming_rate(items, from_date=None, to_date=None):
 	item_codes = list(set([d.get('item_code') for d in items if d.get('item_code') and not d.get('batch_no')]))
 	batch_nos = list(set([d.get('batch_no') for d in items if d.get('batch_no')]))
 
-	return frappe._dict({
-		"batch_incoming_rate": get_batch_incoming_rate(batch_nos),
-		"item_incoming_rate": get_item_valuation_rate(item_codes, from_date, to_date)
-	})
+	out = frappe._dict()
+	out.batch_incoming_rate = get_batch_incoming_rate(batch_nos)
+	out.item_valuation_rate = get_item_valuation_rate(item_codes, po_from_date, po_to_date)
+	return out
 
 
-def get_item_valuation_rate(item_codes, from_date=None, to_date=None):
+def get_item_valuation_rate(item_codes, po_from_date=None, po_to_date=None):
 	if not item_codes:
 		return {}
 
@@ -469,13 +469,13 @@ def get_item_valuation_rate(item_codes, from_date=None, to_date=None):
 		item_values[d.item_code].qty += d.qty
 
 	po_conditions = []
-	po_values = {'item_codes': item_codes}
-	if from_date:
+	po_args = {'item_codes': item_codes}
+	if po_from_date:
 		po_conditions.append("po.schedule_date >= %(from_date)s")
-		po_values['from_date'] = from_date
-	if to_date:
+		po_args['from_date'] = po_from_date
+	if po_to_date:
 		po_conditions.append("po.schedule_date <= %(to_date)s")
-		po_values['to_date'] = to_date
+		po_args['to_date'] = po_to_date
 
 	po_conditions = "and {0}".format(" and ".join(po_conditions)) if po_conditions else ""
 
@@ -488,7 +488,7 @@ def get_item_valuation_rate(item_codes, from_date=None, to_date=None):
 		inner join `tabPurchase Order` po on po.name = item.parent
 		where item.docstatus < 2 and po.status != 'Closed' and item.item_code in %(item_codes)s {0}
 		group by item.item_code
-	""".format(po_conditions), po_values, as_dict=1)
+	""".format(po_conditions), po_args, as_dict=1)
 
 	for d in po_data:
 		item_values[d.item_code].cost += d.cost

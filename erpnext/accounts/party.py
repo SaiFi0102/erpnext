@@ -682,7 +682,7 @@ def get_party_default_items(args, existing_item_codes=None, with_valuation_rates
 		out += sorted(items, key=lambda d: d.item_code)
 
 	if with_valuation_rates:
-		update_item_batch_incoming_rate(out, from_date=args.get('po_cost_from_date'), to_date=args.get('po_cost_to_date'))
+		update_item_batch_incoming_rate(out, po_from_date=args.get('po_cost_from_date'), po_to_date=args.get('po_cost_to_date'))
 
 	return reversed(out)
 

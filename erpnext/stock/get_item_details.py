@@ -1107,8 +1107,8 @@ def get_valuation_rate(item_code, company=None, warehouse=None, from_date=None, 
 
 	if item.get("is_stock_item"):
 		args = [{'item_code': item_code, 'batch_no': batch_no}]
-		incoming_rate_data = get_sales_item_batch_incoming_rate(args, from_date=from_date, to_date=to_date)
-		batch_or_item = 'batch_incoming_rate' if batch_no else 'item_incoming_rate'
+		incoming_rate_data = get_sales_item_batch_incoming_rate(args, po_from_date=from_date, po_to_date=to_date)
+		batch_or_item = 'batch_incoming_rate' if batch_no else 'item_valuation_rate'
 		return {"valuation_rate": flt(incoming_rate_data[batch_or_item].get(batch_no or item_code))}
 
 	elif not item.get("is_stock_item"):
