@@ -40,6 +40,7 @@
   "address_contacts",
   "address_html",
   "website",
+  "linked_supplier",
   "column_break1",
   "contact_html",
   "primary_address_and_contact_detail",
@@ -486,12 +487,18 @@
    "fieldtype": "Link",
    "label": "Invoice Print Format",
    "options": "Print Format"
+  },
+  {
+   "fieldname": "linked_supplier",
+   "fieldtype": "Link",
+   "label": "Linked Supplier",
+   "options": "Supplier"
   }
  ],
  "icon": "fa fa-user",
  "idx": 363,
  "image_field": "image",
- "modified": "2020-08-24 05:52:34.222855",
+ "modified": "2020-09-15 18:12:45.138863",
  "modified_by": "Administrator",
  "module": "Selling",
  "name": "Customer",
