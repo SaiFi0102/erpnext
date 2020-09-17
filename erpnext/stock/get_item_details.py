@@ -1102,12 +1102,12 @@ def get_default_bom(item_code=None):
 def get_valuation_rate(item_code, company=None, warehouse=None, from_date=None, to_date=None, batch_no=None):
 	empty = {"valuation_rate": 0.0}
 
-	from erpnext.accounts.report.gross_profit.gross_profit import get_sales_item_batch_incoming_rate
+	from erpnext.accounts.report.gross_profit.gross_profit import get_item_incoming_rate_data
 	item = frappe.get_cached_doc("Item", item_code)
 
 	if item.get("is_stock_item"):
 		args = [{'item_code': item_code, 'batch_no': batch_no}]
-		incoming_rate_data = get_sales_item_batch_incoming_rate(args, po_from_date=from_date, po_to_date=to_date)
+		incoming_rate_data = get_item_incoming_rate_data(args, po_from_date=from_date, po_to_date=to_date)
 		batch_or_item = 'batch_incoming_rate' if batch_no else 'item_valuation_rate'
 		return {"valuation_rate": flt(incoming_rate_data[batch_or_item].get(batch_no or item_code))}
 

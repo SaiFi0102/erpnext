@@ -430,7 +430,7 @@ class GrossProfitGenerator(object):
 
 
 def update_item_batch_incoming_rate(items, po_from_date=None, po_to_date=None):
-	incoming_rate_data = get_sales_item_batch_incoming_rate(items, po_from_date=po_from_date, po_to_date=po_to_date)
+	incoming_rate_data = get_item_incoming_rate_data(items, po_from_date=po_from_date, po_to_date=po_to_date)
 
 	for d in items:
 		if d.get('item_code') or d.get('batch_no'):
@@ -438,7 +438,7 @@ def update_item_batch_incoming_rate(items, po_from_date=None, po_to_date=None):
 			d.valuation_rate = flt(incoming_rate_data[batch_or_item].get(d.get('batch_no') or d.get('item_code')))
 
 
-def get_sales_item_batch_incoming_rate(items, from_date=None, to_date=None):
+def get_item_incoming_rate_data(items, po_from_date=None, po_to_date=None):
 	if isinstance(items, string_types):
 		items = json.loads(items)
 
