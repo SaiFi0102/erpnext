@@ -318,11 +318,18 @@ class GrossProfitGenerator(object):
 				"width": 140
 			},
 			{
+				"label": _("Warehouse"),
+				"fieldtype": "Link",
+				"fieldname": "warehouse",
+				"options": "Warehouse",
+				"width": 100
+			},
+			{
 				"label": _("UOM"),
 				"fieldtype": "Link",
 				"options": "UOM",
 				"fieldname": "uom",
-				"width": 50
+				"width": 70
 			},
 			{
 				"label": _("Qty"),
