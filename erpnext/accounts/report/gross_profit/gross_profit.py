@@ -195,7 +195,7 @@ class GrossProfitGenerator(object):
 					where lft>=%s and rgt<=%s)""" % (lft, rgt))
 
 		if self.filters.get("territory"):
-			lft, rgt = frappe.db.get_value("Territory", self.filters.customer_group, ["lft", "rgt"])
+			lft, rgt = frappe.db.get_value("Territory", self.filters.territory, ["lft", "rgt"])
 			conditions.append("""c.territory in (select name from `tabTerritory`
 					where lft>=%s and rgt<=%s)""" % (lft, rgt))
 
