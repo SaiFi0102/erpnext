@@ -816,9 +816,7 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 
 		if (frappe.meta.get_docfield(this.frm.doctype, "shipping_address") &&
 			in_list(['Purchase Order', 'Purchase Receipt', 'Purchase Invoice'], this.frm.doctype)){
-			erpnext.utils.get_shipping_address(this.frm, function(){
-				set_party_account(set_pricing);
-			})
+			set_party_account(set_pricing);
 		} else {
 			set_party_account(set_pricing);
 		}
