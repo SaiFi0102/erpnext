@@ -162,6 +162,12 @@ frappe.query_reports["Price List"] = {
 			options: "Default UOM\nStock UOM\nContents UOM",
 			default: "Default UOM"
 		},
+		{
+			fieldname: "highlight_margin_lower_bound",
+			label: __("Hightlight if Margin less than"),
+			fieldtype: "Float",
+			default: 15
+		},
 	],
 	formatter: function(value, row, column, data, default_formatter) {
 		if (!data) {
@@ -207,6 +213,11 @@ frappe.query_reports["Price List"] = {
 			if(po_to_date) {
 				options.link_href += encodeURI("&to_date=" + po_to_date);
 			}
+		}
+
+		var highlight_margin_lower_bound = flt(frappe.query_report.get_filter_value("highlight_margin_lower_bound"));
+		if (highlight_margin_lower_bound && column.fieldname == "margin_rate" && data['margin_rate'] < highlight_margin_lower_bound) {
+			options.css['background-color'] = '#efb4b4';
 		}
 
 		if (['po_qty', 'actual_qty', 'standard_rate', 'avg_lc_rate'].includes(column.fieldname)) {
