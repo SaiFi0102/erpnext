@@ -28,6 +28,7 @@ frappe.query_reports["Qty Adjust"] = {
 			label: __("Item Group"),
 			fieldtype: "Link",
 			options:"Item Group",
+			default: frappe.defaults.get_user_default("Item Group") || ''
 		},
 		{
 			fieldname: "brand",
