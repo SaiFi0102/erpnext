@@ -25,14 +25,14 @@ frappe.query_reports["Sales Analytics"] = {
 			label: __("Amount Or Qty"),
 			fieldtype: "Select",
 			options: ["Net Amount", "Amount", "Stock Qty", "Contents Qty", "Transaction Qty"],
-			default: "Stock Qty",
+			default: "Net Amount",
 			reqd: 1
 		},
 		{
 			fieldname: "from_date",
 			label: __("From Date"),
 			fieldtype: "Date",
-			default: frappe.defaults.get_user_default("year_start_date"),
+			default: frappe.datetime.add_days(frappe.datetime.get_today(), -8*7),
 			reqd: 1
 		},
 		{
