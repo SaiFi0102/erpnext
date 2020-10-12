@@ -688,3 +688,4 @@ erpnext.patches.v12_0.rename_b3_transaction_no
 erpnext.patches.v12_0.update_pricing_rule_table
 erpnext.patches.v12_0.update_sales_invoice_return_si_detail
 execute:frappe.rename_doc("Role", "Batch Profitability Role", "Purchase Analytics Role")
+erpnext.patches.v12_0.fix_payment_entry_ref_bill_no

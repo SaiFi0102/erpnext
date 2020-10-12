@@ -716,7 +716,7 @@ def get_outstanding_reference_documents(args):
 			elif d.voucher_type == "Journal Entry":
 				d["exchange_rate"] = get_average_party_exchange_rate_on_journal_entry(d.voucher_no,
 					args.get("party_type"), args.get("party"), args.get("party_account"))
-		if d.voucher_type in ("Purchase Invoice"):
+		if d.voucher_type in ("Purchase Invoice", "Journal Entry", "Landed Cost Voucher"):
 			d["bill_no"] = frappe.db.get_value(d.voucher_type, d.voucher_no, "bill_no")
 		if d.voucher_type == "Purchase Invoice":
 			d["reference_date"] = frappe.db.get_value(d.voucher_type, d.voucher_no, "received_date")

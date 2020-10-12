@@ -740,10 +740,6 @@ frappe.ui.form.on('Payment Entry', {
 
 				frm.events.allocate_party_amount_against_ref_docs(frm,
 					(frm.doc.payment_type=="Receive" ? frm.doc.paid_amount : frm.doc.received_amount));
-			
-			///////////////////////// custom function to set reference and dates
-				frm.events.allocate_reference_and_dates(frm);
-			//////////////////////////////////////////////////////////////////////////
 			}
 		});
 	},
@@ -1395,32 +1391,6 @@ frappe.ui.form.on("Payment Entry", {
 			frm.refresh_fields();
 		}
 	},
-	allocate_reference_and_dates: function(frm){
-		var idx = 0;
-		for(idx=0;idx<frm.doc.references.length;idx++)
-			{
-				if(frm.doc.references[idx].reference_name)
-				{
-					frappe.call({
-							method:'erpnext.api.paymentReferenceDate',
-							args: {
-								row: idx,
-								reference_doctype: frm.doc.references[idx].reference_doctype,
-								reference_name: frm.doc.references[idx].reference_name
-							},
-							callback: function(r) {
-								//console.log(r.message);
-								var idx = parseInt(r.message[0].row);
-								frm.doc.references[idx].due_date = r.message[0].due_date;
-								frm.doc.references[idx].cheque_no = r.message[0].cheque_no;
-								cur_frm.refresh_field("references");
-							}
-					});
-				}
-			}
-			cur_frm.refresh_field("references");
-
-	}
 });
 frappe.ui.form.on('Payment Entry Reference', {
 	allocated_amount: function(frm, cdt, cdn) {
