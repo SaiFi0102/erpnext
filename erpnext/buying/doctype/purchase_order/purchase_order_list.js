@@ -4,6 +4,8 @@ frappe.listview_settings['Purchase Order'] = {
 	get_indicator: function (doc) {
 		if (doc.status === "Closed") {
 			return [__("Closed"), "green", "status,=,Closed"];
+		} else if (doc.docstatus == 0) {
+			return [__("Draft"), "red", "docstatus,=,0"]
 		} else if (doc.status === "On Hold") {
 			return [__("On Hold"), "orange", "status,=,On Hold"];
 		} else if (doc.status === "Delivered") {
@@ -22,6 +24,7 @@ frappe.listview_settings['Purchase Order'] = {
 			return [__("Completed"), "green", "per_received,=,100|per_completed,=,100|status,!=,Closed"];
 		}
 	},
+	has_indicator_for_draft: 1,
 	onload: function (listview) {
 		listview.page.add_action_item(__("Create Landed Cost Voucher"), function () {
 			var names = cur_list.get_checked_items(true);

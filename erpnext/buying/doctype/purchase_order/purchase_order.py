@@ -424,7 +424,7 @@ def close_or_unclose_purchase_orders(names, status):
 	names = json.loads(names)
 	for name in names:
 		po = frappe.get_doc("Purchase Order", name)
-		if po.docstatus == 1:
+		if po.docstatus < 2:
 			if status == "Closed":
 				if po.status not in ( "Cancelled", "Closed") and (po.per_received < 100 or po.per_billed < 100):
 					po.update_status(status)
