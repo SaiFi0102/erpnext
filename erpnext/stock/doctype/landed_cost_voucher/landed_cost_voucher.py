@@ -549,20 +549,27 @@ def get_purchase_receipt_details(dt, dn):
 
 @frappe.whitelist()
 def get_landed_cost_voucher(dt, dn):
-	doc = frappe.get_doc(dt, dn)
+	if isinstance(dn, string_types):
+		dn = frappe.parse_json(dn)
+
+	dn_details = frappe.db.sql("select name, company from `tab{0}` where name in %s".format(dt), [dn])
+	dn_details = dict(dn_details) if dn_details else {}
+
+	if not dn_details:
+		frappe.throw(_("No valid {0} provided").format(dt))
+	if len(set(list(dn_details.values()))) != 1:
+		frappe.throw(_("All {0} must be of the same Company").format(dt))
 
 	lcv = frappe.new_doc("Landed Cost Voucher")
-	lcv.company = doc.company
 
-	row = lcv.append("purchase_receipts", {
-		"receipt_document_type": dt,
-		"receipt_document": dn
-	})
-	row.update(get_purchase_receipt_details(dt, dn))
+	for name, company in dn_details.items():
+		lcv.company = company
 
-	if doc.get("letter_of_credit"):
-		lcv.party_type = "Letter of Credit"
-		lcv.party = doc.get("letter_of_credit")
+		row = lcv.append("purchase_receipts", {
+			"receipt_document_type": dt,
+			"receipt_document": name
+		})
+		row.update(get_purchase_receipt_details(dt, name))
 
 	lcv.get_items_from_purchase_receipts()
 	return lcv

@@ -300,7 +300,7 @@ erpnext.buying.BuyingController = erpnext.TransactionController.extend({
 			method: "erpnext.stock.doctype.landed_cost_voucher.landed_cost_voucher.get_landed_cost_voucher",
 			args: {
 				"dt": cur_frm.doc.doctype,
-				"dn": cur_frm.doc.name
+				"dn": [cur_frm.doc.name]
 			},
 			callback: function(r) {
 				var doclist = frappe.model.sync(r.message);

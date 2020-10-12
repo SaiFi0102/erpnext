@@ -23,14 +23,33 @@ frappe.listview_settings['Purchase Order'] = {
 		}
 	},
 	onload: function (listview) {
-		var method = "erpnext.buying.doctype.purchase_order.purchase_order.close_or_unclose_purchase_orders";
+		listview.page.add_action_item(__("Create Landed Cost Voucher"), function () {
+			var names = cur_list.get_checked_items(true);
+			if (!names || !names.length) {
+				return;
+			}
 
-		listview.page.add_menu_item(__("Close"), function () {
-			listview.call_for_selected_items(method, { "status": "Closed" });
+			return frappe.call({
+				method: "erpnext.stock.doctype.landed_cost_voucher.landed_cost_voucher.get_landed_cost_voucher",
+				args: {
+					"dt": "Purchase Order",
+					"dn": names
+				},
+				callback: function(r) {
+					var doclist = frappe.model.sync(r.message);
+					frappe.set_route("Form", doclist[0].doctype, doclist[0].name);
+				}
+			});
 		});
 
-		listview.page.add_menu_item(__("Re-open"), function () {
-			listview.call_for_selected_items(method, { "status": "Submitted" });
+		var status_method = "erpnext.buying.doctype.purchase_order.purchase_order.close_or_unclose_purchase_orders";
+
+		listview.page.add_action_item(__("Close"), function () {
+			listview.call_for_selected_items(status_method, { "status": "Closed" });
+		});
+
+		listview.page.add_action_item(__("Re-open"), function () {
+			listview.call_for_selected_items(status_method, { "status": "Submitted" });
 		});
 	}
 };
