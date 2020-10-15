@@ -150,7 +150,7 @@ erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend(
 
 		this.frm.set_df_property("drop_ship", "hidden", !is_drop_ship);
 
-		if(doc.docstatus == 1 && !in_list(["Closed", "Delivered"], doc.status)) {
+		if(doc.docstatus < 1 && !in_list(["Closed", "Delivered"], doc.status)) {
 			if (this.frm.has_perm("submit")) {
 				if(flt(doc.per_completed, 6) < 100 || flt(doc.per_received, 6) < 100) {
 					cur_frm.add_custom_button(__('Close'), this.close_purchase_order, __("Status"));
@@ -683,7 +683,13 @@ erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend(
 	},
 
 	close_purchase_order: function(){
-		cur_frm.cscript.update_status('Close', 'Closed')
+		if (cur_frm.doc.docstatus == 0) {
+			frappe.confirm(__('Are you sure you want to close this Purchase Order. This will cancel the document permanently.'), function () {
+				cur_frm.cscript.update_status('Close', 'Closed')
+			})
+		} else {
+			cur_frm.cscript.update_status('Close', 'Closed')
+		}
 	},
 
 	delivered_by_supplier: function(){

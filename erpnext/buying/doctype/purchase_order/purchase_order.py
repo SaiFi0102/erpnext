@@ -289,6 +289,12 @@ class PurchaseOrder(BuyingController):
 				raise_exception=True)
 
 	def update_status(self, status):
+		if self.docstatus == 0 and status == "Closed":
+			#self.submit()
+			self.flags.allow_draft_cancel = 1
+			self.cancel()
+			return
+
 		self.check_modified_date()
 		self.set_status(update=True, status=status)
 		self.update_requested_qty()
@@ -662,8 +668,10 @@ def calculate_b3_transaction_no_check_digit(b3_transaction_no):
 @frappe.whitelist()
 def update_status(status, name):
 	po = frappe.get_doc("Purchase Order", name)
-	po.update_status(status)
-	po.update_delivered_qty_in_sales_order()
+
+	if po.docstatus < 2:
+		po.update_status(status)
+		po.update_delivered_qty_in_sales_order()
 
 @frappe.whitelist()
 def make_inter_company_sales_order(source_name, target_doc=None):
