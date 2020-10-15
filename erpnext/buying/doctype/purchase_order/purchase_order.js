@@ -150,7 +150,7 @@ erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend(
 
 		this.frm.set_df_property("drop_ship", "hidden", !is_drop_ship);
 
-		if(!in_list(["Closed", "Delivered"], doc.status)) {
+		if(doc.docstatus == 1 && !in_list(["Closed", "Delivered"], doc.status)) {
 			if (this.frm.has_perm("submit")) {
 				if(flt(doc.per_completed, 6) < 100 || flt(doc.per_received, 6) < 100) {
 					cur_frm.add_custom_button(__('Close'), this.close_purchase_order, __("Status"));
@@ -167,7 +167,7 @@ erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend(
 			cur_frm.cscript.add_from_mappers();
 		}
 
-		if(in_list(["Closed", "Delivered"], doc.status)) {
+		if(doc.docstatus == 1 && in_list(["Closed", "Delivered"], doc.status)) {
 			if (this.frm.has_perm("submit")) {
 				cur_frm.add_custom_button(__('Re-open'), this.unclose_purchase_order, __("Status"));
 			}
