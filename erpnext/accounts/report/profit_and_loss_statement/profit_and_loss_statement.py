@@ -19,13 +19,15 @@ def execute(filters=None):
 		accumulated_values=filters.accumulated_values,
 		ignore_closing_entries=True, ignore_accumulated_values_for_fy= True)
 
-	net_profit_loss = get_net_profit_loss(income, expense, period_list, filters.company, filters.presentation_currency)
+	net_profit_loss, margin = get_net_profit_loss(income, expense, period_list, filters.company, filters.presentation_currency,
+		with_margin=True)
 
 	data = []
 	data.extend(income or [])
 	data.extend(expense or [])
 	if net_profit_loss:
 		data.append(net_profit_loss)
+		data.append(margin)
 
 	columns = get_columns(filters.periodicity, period_list, filters.accumulated_values, filters.company)
 
@@ -33,13 +35,20 @@ def execute(filters=None):
 
 	return columns, data, None, chart
 
-def get_net_profit_loss(income, expense, period_list, company, currency=None, consolidated=False):
+def get_net_profit_loss(income, expense, period_list, company, currency=None, consolidated=False, with_margin=False):
 	total = 0
+	grand_total_income = 0
+	grand_total_expense = 0
+
 	net_profit_loss = {
 		"account_name": "'" + _("Profit for the year") + "'",
 		"account": "'" + _("Profit for the year") + "'",
 		"warn_if_negative": True,
 		"currency": currency or frappe.get_cached_value('Company',  company,  "default_currency")
+	}
+	margin = {
+		"account_name": "'" + _("Profit %") + "'",
+		"account": "'" + _("Profit %") + "'",
 	}
 
 	has_value = False
@@ -51,14 +60,23 @@ def get_net_profit_loss(income, expense, period_list, company, currency=None, co
 
 		net_profit_loss[key] = total_income - total_expense
 
+		margin[key] = net_profit_loss[key] / total_income * 100 if total_income else 0
+
 		if net_profit_loss[key]:
 			has_value=True
 
 		total += flt(net_profit_loss[key])
+		grand_total_income += total_income
+		grand_total_expense += total_expense
 		net_profit_loss["total"] = total
 
+	margin["total"] = total / grand_total_income * 100 if grand_total_income else 0
+
 	if has_value:
-		return net_profit_loss
+		if with_margin:
+			return net_profit_loss, margin
+		else:
+			return net_profit_loss
 
 def get_chart_data(filters, columns, income, expense, net_profit_loss):
 	labels = [d.get("label") for d in columns[2:]]
