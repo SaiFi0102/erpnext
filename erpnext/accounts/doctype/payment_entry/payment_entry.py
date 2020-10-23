@@ -224,7 +224,8 @@ class PaymentEntry(AccountsController):
 					self.party_type, self.party, self.paid_from if self.payment_type == "Receive" else self.paid_to)
 
 				for field, value in iteritems(ref_details):
-					d.set(field, value)
+					if field != "bill_no" or not d.get(field):
+						d.set(field, value)
 
 	def validate_payment_type(self):
 		if self.payment_type not in ("Receive", "Pay", "Internal Transfer"):
@@ -922,7 +923,6 @@ def get_reference_details(reference_doctype, reference_name, party_account_curre
 
 		if reference_doctype in ("Sales Invoice", "Purchase Invoice"):
 			outstanding_amount = ref_doc.get("outstanding_amount")
-			bill_no = ref_doc.get("bill_no")
 		elif reference_doctype == "Expense Claim":
 			outstanding_amount = flt(ref_doc.get("total_sanctioned_amount")) \
 				- flt(ref_doc.get("total_amount+reimbursed")) - flt(ref_doc.get("total_advance_amount"))
@@ -934,6 +934,8 @@ def get_reference_details(reference_doctype, reference_name, party_account_curre
 		# Get the exchange rate based on the posting date of the ref doc
 		exchange_rate = get_exchange_rate(party_account_currency,
 			company_currency, ref_doc.posting_date)
+
+	bill_no = ref_doc.get("bill_no")
 
 	return frappe._dict({
 		"due_date": ref_doc.get("due_date"),

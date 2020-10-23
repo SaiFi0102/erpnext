@@ -46,8 +46,7 @@
    "fieldname": "bill_no",
    "fieldtype": "Data",
    "label": "Supplier Invoice No",
-   "no_copy": 1,
-   "read_only": 1
+   "no_copy": 1
   },
   {
    "fieldname": "column_break_4",
@@ -100,7 +99,7 @@
   }
  ],
  "istable": 1,
- "modified": "2020-10-07 11:34:54.755392",
+ "modified": "2020-10-22 14:44:08.484716",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Payment Entry Reference",
