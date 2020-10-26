@@ -439,7 +439,7 @@ def get_cost_centers_with_children(cost_centers):
 
 	return list(set(all_cost_centers))
 
-def get_columns(periodicity, period_list, accumulated_values=1, company=None):
+def get_columns(periodicity, period_list, accumulated_values=1, company=None, add_income_ratio=False):
 	columns = [{
 		"fieldname": "account",
 		"label": _("Account"),
@@ -455,6 +455,22 @@ def get_columns(periodicity, period_list, accumulated_values=1, company=None):
 			"options": "Currency",
 			"hidden": 1
 		})
+	if periodicity!="Yearly":
+		if not accumulated_values:
+			columns.append({
+				"fieldname": "total",
+				"label": _("Total"),
+				"fieldtype": "Currency",
+				"width": 150
+			})
+			if add_income_ratio:
+				columns.append({
+					"fieldname": "income_ratio",
+					"label": _("Income Ratio"),
+					"fieldtype": "Percent",
+					"width": 100,
+					"is_special_column": 1
+				})
 	for period in period_list:
 		columns.append({
 			"fieldname": period.key,
@@ -465,13 +481,5 @@ def get_columns(periodicity, period_list, accumulated_values=1, company=None):
 			"to_date": period.to_date,
 			"width": 150
 		})
-	if periodicity!="Yearly":
-		if not accumulated_values:
-			columns.append({
-				"fieldname": "total",
-				"label": _("Total"),
-				"fieldtype": "Currency",
-				"width": 150
-			})
 
 	return columns

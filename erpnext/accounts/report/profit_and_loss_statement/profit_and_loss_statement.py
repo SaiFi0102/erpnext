@@ -27,11 +27,24 @@ def execute(filters=None):
 	if net_profit_loss:
 		data.append(net_profit_loss)
 
-	columns = get_columns(filters.periodicity, period_list, filters.accumulated_values, filters.company)
+	add_income_ratio(income, income)
+	add_income_ratio(income, expense)
+	add_income_ratio(income, [net_profit_loss])
+
+	columns = get_columns(filters.periodicity, period_list, filters.accumulated_values, filters.company, add_income_ratio=True)
 
 	chart = get_chart_data(filters, columns, income, expense, net_profit_loss)
 
 	return columns, data, None, chart
+
+def add_income_ratio(income, rows):
+	if not rows or not income:
+		return
+
+	total_income = flt(income[-2]['total'])
+
+	for row in rows:
+		row['income_ratio'] = flt(row.get('total')) / total_income * 100 if total_income and row.get('total') else None
 
 def get_net_profit_loss(income, expense, period_list, company, currency=None, consolidated=False):
 	total = 0
@@ -61,6 +74,8 @@ def get_net_profit_loss(income, expense, period_list, company, currency=None, co
 		return net_profit_loss
 
 def get_chart_data(filters, columns, income, expense, net_profit_loss):
+	columns = [c for c in columns if not c.get('is_special_column')]
+
 	labels = [d.get("label") for d in columns[2:]]
 
 	income_data, expense_data, net_profit = [], [], []
