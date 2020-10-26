@@ -150,6 +150,8 @@ class AccountsController(TransactionBase):
 			self.validate_non_invoice_documents_schedule()
 
 	def before_print(self):
+		from frappe.contacts.doctype.address.address import get_address_display
+
 		if self.doctype in ['Purchase Order', 'Sales Order', 'Sales Invoice', 'Purchase Invoice',
 							'Supplier Quotation', 'Purchase Receipt', 'Delivery Note', 'Quotation']:
 			if self.get("group_same_items"):
@@ -161,6 +163,9 @@ class AccountsController(TransactionBase):
 				self.discount_amount = -self.discount_amount
 			else:
 				df.set("print_hide", 1)
+
+		self.company_address_doc = erpnext.get_company_address(self)
+		self.company_address_display = get_address_display(self.company_address_doc.as_dict()) if self.company_address_doc else ""
 
 	def calculate_paid_amount(self):
 		if hasattr(self, "is_pos") or hasattr(self, "is_paid"):

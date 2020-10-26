@@ -38,7 +38,7 @@ Please set HS Codes and reload this print format.
 			<td colspan="6" style="width: 50%;">
 				<p class="form1label">2. Purchaser (Name and Address) / Acheteur (nom et adresse)</p>
 				<p class="form1data">{{ doc.get_formatted('company')}}</p>
-				<p class="form1data">{{ doc.get_formatted('shipping_address')}}</p>
+				<p class="form1data">{{ doc.company_address_display }}</p>
 			</td>
 		</tr>
 		<!-- #ROW 3 - 4 -->
