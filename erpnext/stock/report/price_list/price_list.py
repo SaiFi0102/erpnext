@@ -391,11 +391,20 @@ def set_item_pl_rate(effective_date, item_code, price_list, price_list_rate, is_
 
 	_set_item_pl_rate(effective_date, item_code, price_list, price_list_rate, uom, conversion_factor)
 
-	dependent_price_list_visited = set()
+	dependent_item_prices_by_price_list = {}
 	for d in dependent_item_prices:
-		if d.price_list not in dependent_price_list_visited:
-			dependent_price_list_visited.add(d.price_list)
-			_set_item_pl_rate(effective_date, item_code, d.price_list, flt(price_list_rate) + flt(d.diff), uom, conversion_factor)
+		dependent_item_prices_by_price_list.setdefault(d.price_list, []).append(d)
+
+	for price_list in dependent_item_prices_by_price_list:
+		dependent_item_prices_by_price_list[price_list] = sorted(dependent_item_prices_by_price_list[price_list],
+			key=lambda d: (cstr(d.uom) == cstr(uom), bool(d.uom)), reverse=True)
+
+	dependent_price_list_visited = set()
+	for item_prices in dependent_item_prices_by_price_list.values():
+		for d in item_prices:
+			if d.price_list not in dependent_price_list_visited:
+				dependent_price_list_visited.add(d.price_list)
+				_set_item_pl_rate(effective_date, item_code, d.price_list, flt(price_list_rate) + flt(d.diff), uom, conversion_factor)
 
 	if not filters:
 		filters = {}
