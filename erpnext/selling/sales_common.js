@@ -771,6 +771,7 @@ Customer Request`}
 					if (!r.exc) {
 						me.get_item_custom_projected_qty && me.get_item_custom_projected_qty(); //workaround
 						me.calculate_gross_profit();
+						me.frm.refresh_fields();
 					}
 				}
 			});

@@ -211,7 +211,10 @@ erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend(
 			cur_frm.add_custom_button(__('Landed Cost Voucher'), this.make_landed_cost_voucher, __("Create"));
 		}
 
-		this.frm.cscript.calculate_gross_profit();
+		if(doc.docstatus < 2) {
+			this.calculate_gross_profit();
+			this.frm.refresh_fields();
+		}
 	},
 
 	show_hide_add_update_item_prices: function() {
@@ -783,6 +786,10 @@ erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend(
 	show_set_base_price_dialog: function (item, new_price, old_price) {
 		var me = this;
 
+		if (!me.can_get_gross_profit()) {
+			return;
+		}
+
 		var dialog = new frappe.ui.Dialog({
 			title: __('Update Base Selling Price'),
 			fields: [
@@ -871,10 +878,6 @@ erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend(
 			primary_action_label: __('Update')
 		});
 		dialog.show();
-	},
-
-	update_base_selling_price() {
-
 	},
 
 	get_base_selling_prices: function() {

@@ -35,9 +35,8 @@ class BuyingController(StockController):
 				self.grand_total)
 
 	def onload(self):
-		if self.doctype == "Purchase Order" and self.docstatus == 0:
+		if self.doctype == "Purchase Order" and self.docstatus < 2:
 			self.set_base_selling_price()
-			self.calculate_taxes_and_totals()
 
 	def set_base_selling_price(self):
 		from erpnext.stock.get_item_details import get_base_selling_price

@@ -168,7 +168,10 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 			});
 		}
 
-		this.calculate_gross_profit();
+		if (this.frm.doc.docstatus < 2) {
+			this.calculate_gross_profit();
+			this.frm.refresh_fields();
+		}
 	},
 
 	make_maintenance_schedule: function() {
