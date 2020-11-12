@@ -102,6 +102,9 @@ def get_item_details(args, doc=None, for_validate=False, overwrite_warehouse=Tru
 	if args.get("is_subcontracted") == "Yes":
 		out.bom = args.get('bom') or get_default_bom(args.item_code)
 
+	if args.doctype == 'Purchase Order':
+		out.base_selling_price = flt(get_base_selling_price(args, item.name))
+
 	if not skip_valuation_rates and args.transaction_type == 'selling':
 		get_gross_profit(out)
 
@@ -709,6 +712,39 @@ def get_item_price(args, item_code, ignore_party=False):
 		return convertible_prices
 
 	return out
+
+@frappe.whitelist()
+def get_base_selling_price(args, item_code):
+	if isinstance(args, string_types):
+		args = frappe._dict(json.loads(args))
+
+	args = get_price_list_currency_and_exchange_rate(args)
+	if frappe.get_cached_value("Stock Settings", None, "get_prices_based_on_date") == "Delivery Date":
+		price_date = args.get('delivery_date') or args.get('transaction_date')
+	else:
+		price_date = args.get('transaction_date')
+
+	base_price_list = frappe.get_cached_value("Selling Settings", None, "base_price_list")
+	if base_price_list:
+		item_price_args = {
+			"item_code": item_code,
+			"price_list": base_price_list,
+			"uom": args.get('uom'),
+			"transaction_date": price_date,
+		}
+
+		item_price_data = get_item_price(item_price_args, item_code)
+		if item_price_data:
+			if item_price_data[0][2] == args.get("uom"):
+				return item_price_data[0][1]
+			elif args.get('price_list_uom_dependant'):
+				return convert_item_uom_for(value=item_price_data[0][1], item_code=item_code,
+					from_uom=item_price_data[0][2], to_uom=args.get("uom"),
+					conversion_factor=args.get("conversion_factor"))
+			else:
+				return item_price_data[0][1]
+	else:
+		return 0
 
 def get_price_list_rate_for(args, item_code):
 	"""

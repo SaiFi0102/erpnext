@@ -262,7 +262,7 @@ class AccountsController(TransactionBase):
 				self.conversion_rate = get_exchange_rate(self.currency,
 														 self.company_currency, transaction_date, args)
 
-	def get_item_details_parent_args(self):
+	def get_item_details_parent_args(self, delivery_date_field=None):
 		parent_dict = frappe._dict()
 		for fieldname in self.meta.get_valid_columns():
 			parent_dict[fieldname] = self.get(fieldname)
@@ -274,6 +274,12 @@ class AccountsController(TransactionBase):
 		# party_name field used for customer in quotation
 		if self.doctype == "Quotation" and self.quotation_to == "Customer" and parent_dict.get("party_name"):
 			parent_dict.update({"customer": parent_dict.get("party_name")})
+
+		if delivery_date_field and self.get(delivery_date_field):
+			parent_dict.delivery_date = self.get(delivery_date_field)
+
+		if not parent_dict.delivery_date:
+			parent_dict.delivery_date = parent_dict.delivery_date or parent_dict.shipping_date or parent_dict.transaction_date or parent_dict.posting_date
 
 		return parent_dict
 

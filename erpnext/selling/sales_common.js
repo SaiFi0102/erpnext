@@ -174,12 +174,6 @@ Customer Request`}
 		this.set_item_warning_color(frappe.get_doc(cdt, cdn));
 	},
 
-	can_get_gross_profit: function () {
-		var has_permission = this.frm.fields_dict.total_gross_profit && this.frm.fields_dict.total_gross_profit.disp_status;
-		var allowed_doctype = ['Sales Order', 'Sales Invoice'].includes(this.frm.doc.doctype);
-		return allowed_doctype && this.frm.doc.docstatus < 2 && !this.frm.doc.is_return && has_permission && has_permission != 'None';
-	},
-
 	update_selected_item_fields: function() {
 		this.update_selected_item_select_batch_button();
 		this.update_selected_item_gross_profit();

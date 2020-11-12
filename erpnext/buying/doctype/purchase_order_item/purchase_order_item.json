@@ -15,6 +15,7 @@
   "column_break_4",
   "rate",
   "base_rate",
+  "base_selling_price",
   "tax_exclusive_rate",
   "base_tax_exclusive_rate",
   "column_break_10",
@@ -1031,11 +1032,19 @@
    "no_copy": 1,
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "base_selling_price",
+   "fieldtype": "Currency",
+   "label": "Base Selling Price",
+   "options": "Company:company:default_currency",
+   "permlevel": 3,
+   "read_only": 1
   }
  ],
  "idx": 1,
  "istable": 1,
- "modified": "2020-08-20 03:15:04.457732",
+ "modified": "2020-11-12 13:36:33.632218",
  "modified_by": "Administrator",
  "module": "Buying",
  "name": "Purchase Order Item",

@@ -596,6 +596,29 @@ class calculate_taxes_and_totals(object):
 			self.doc.total_gross_profit = self.doc.total_revenue - self.doc.total_cogs
 			self.doc.per_gross_profit = self.doc.total_gross_profit / self.doc.total_revenue * 100 if self.doc.total_revenue else 0
 
+		elif self.doc.doctype == "Purchase Order":
+			self.doc.total_revenue = 0
+			self.doc.total_cogs = 0
+
+			for item in self.doc.items:
+				item.cogs_per_unit = flt(item.landed_rate) * flt(item.conversion_factor)
+				if flt(item.get('alt_uom_size_std')):
+					item.cogs_per_unit *= flt(item.alt_uom_size) / flt(item.alt_uom_size_std)
+
+				item.revenue = flt(item.qty) * flt(item.conversion_factor) * flt(item.base_selling_price)
+				item.cogs_qty = flt(item.qty)
+				item.cogs = item.cogs_per_unit * item.cogs_qty
+				item.gross_profit = item.revenue - item.cogs
+				item.per_gross_profit = item.gross_profit / item.revenue * 100 if item.revenue else 0
+				item.gross_profit_per_unit = item.gross_profit / item.cogs_qty if item.cogs_qty else 0
+
+				if item.cogs:
+					self.doc.total_revenue += item.revenue
+					self.doc.total_cogs += item.cogs
+
+			self.doc.total_gross_profit = self.doc.total_revenue - self.doc.total_cogs
+			self.doc.per_gross_profit = self.doc.total_gross_profit / self.doc.total_revenue * 100 if self.doc.total_revenue else 0
+
 	def set_rounded_total(self):
 		if self.doc.meta.get_field("rounded_total"):
 			if self.doc.is_rounded_total_disabled():

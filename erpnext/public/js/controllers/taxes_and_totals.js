@@ -687,6 +687,7 @@ erpnext.taxes_and_totals = erpnext.payments.extend({
 			this.frm.doc.per_gross_profit = this.frm.doc.total_revenue ? this.frm.doc.total_gross_profit / this.frm.doc.total_revenue * 100 : 0;
 
 			this.update_selected_item_gross_profit();
+
 		} else if (["Sales Invoice", "Sales Order"].includes(this.frm.doc.doctype)) {
 			this.frm.doc.total_revenue = 0;
 			this.frm.doc.total_cogs = 0;
@@ -712,6 +713,34 @@ erpnext.taxes_and_totals = erpnext.payments.extend({
 
 			this.frm.doc.total_gross_profit = this.frm.doc.total_revenue - this.frm.doc.total_cogs;
 			this.frm.doc.per_gross_profit = this.frm.doc.total_revenue ? this.frm.doc.total_gross_profit / this.frm.doc.total_revenue * 100 : 0;
+
+			this.update_selected_item_gross_profit();
+
+		} else if (this.frm.doc.doctype == "Purchase Order") {
+			this.frm.doc.total_revenue = 0;
+			this.frm.doc.total_cogs = 0;
+
+			$.each(this.frm.doc.items || [], function (i, item) {
+				item.cogs_per_unit = flt(item.landed_rate) * flt(item.conversion_factor);
+				if (flt(item.alt_uom_size_std)) {
+					item.cogs_per_unit *= flt(item.alt_uom_size) / flt(item.alt_uom_size_std);
+				}
+
+				item.revenue = flt(item.qty) * flt(item.conversion_factor) * flt(item.base_selling_price);
+				item.cogs_qty = flt(item.qty);
+				item.cogs = item.cogs_per_unit * item.cogs_qty;
+				item.gross_profit = item.revenue - item.cogs;
+				item.per_gross_profit = item.revenue ? item.gross_profit / item.revenue * 100 : 0;
+				item.gross_profit_per_unit = item.cogs_qty ? item.gross_profit / item.cogs_qty : 0;
+
+				if (item.cogs) {
+					me.frm.doc.total_revenue += item.revenue;
+					me.frm.doc.total_cogs += item.cogs;
+				}
+			});
+
+			this.frm.doc.total_gross_profit = this.frm.doc.total_revenue - this.frm.doc.total_cogs;
+			this.frm.doc.per_gross_profit = this.frm.doc.total_revenue ? this.frm.doc.total_gross_profit / this.frm.doc.total_revenue * 100 : 0
 
 			this.update_selected_item_gross_profit();
 		}

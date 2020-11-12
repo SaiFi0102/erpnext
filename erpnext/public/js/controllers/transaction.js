@@ -2004,6 +2004,12 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 		}
 	},
 
+	can_get_gross_profit: function () {
+		var has_permission = this.frm.fields_dict.total_gross_profit && this.frm.fields_dict.total_gross_profit.disp_status;
+		var allowed_doctype = ['Sales Order', 'Sales Invoice', 'Purchase Order'].includes(this.frm.doc.doctype);
+		return allowed_doctype && this.frm.doc.docstatus < 2 && !this.frm.doc.is_return && has_permission && has_permission != 'None';
+	},
+
 	setup_item_selector: function() {
 		// TODO: remove item selector
 

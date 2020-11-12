@@ -121,6 +121,8 @@ frappe.ui.form.on("Purchase Order Item", {
 });
 
 erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend({
+	item_po_gross_profit_fields: ["base_selling_price", "gross_profit", "gross_profit_per_unit", "per_gross_profit"],
+
 	refresh: function(doc, cdt, cdn) {
 		var me = this;
 		this._super();
@@ -208,6 +210,8 @@ erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend(
 		if(doc.docstatus < 2 && !doc.__islocal) {
 			cur_frm.add_custom_button(__('Landed Cost Voucher'), this.make_landed_cost_voucher, __("Create"));
 		}
+
+		this.frm.cscript.calculate_gross_profit();
 	},
 
 	show_hide_add_update_item_prices: function() {
@@ -368,6 +372,40 @@ erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend(
 
 	has_unsupplied_items: function() {
 		return this.frm.doc['supplied_items'].some(item => item.required_qty != item.supplied_qty)
+	},
+
+	update_selected_item_fields: function() {
+		this.update_selected_item_gross_profit();
+	},
+
+	update_selected_item_gross_profit: function() {
+		var me = this;
+		var grid_row = this.selected_item_dn ? this.frm.fields_dict['items'].grid.grid_rows_by_docname[this.selected_item_dn] : null;
+
+		var all_fields = [];
+		all_fields.push(...this.item_po_gross_profit_fields);
+
+		if(grid_row && grid_row.doc.item_code) {
+			$.each(all_fields, function (i, f) {
+				me.frm.doc['selected_' + f] = grid_row.doc[f];
+			});
+		} else {
+			$.each(all_fields, function (i, f) {
+				me.frm.doc['selected_' + f] = 0;
+			});
+		}
+
+		$.each(me.gp_link_fields || [], function (i, f) {
+			var link = "desk#query-report/Batch Profitability";
+			if (grid_row) {
+				link += "?batch_no=" + grid_row.doc.batch_no;
+			}
+			$("a", me.frm.fields_dict['selected_' + f].$input_wrapper).attr("href", link);
+		});
+
+		$.each(all_fields.map(d => "selected_" + d), function (i, fieldname) {
+			me.frm.refresh_field(fieldname);
+		});
 	},
 
 	make_stock_entry: function() {
@@ -702,6 +740,156 @@ erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend(
 
 	schedule_date: function() {
 		set_schedule_date(this.frm);
+		this.get_base_selling_prices();
+	},
+
+	transaction_date: function () {
+		this._super();
+		this.get_base_selling_prices();
+	},
+
+	selected_base_selling_price: function() {
+		var me = this;
+		var new_price = flt(me.frm.doc.selected_base_selling_price);
+		if (!new_price) {
+			return;
+		}
+		if (!me.selected_item_dn) {
+			me.frm.doc.selected_base_selling_price = 0;
+			me.frm.refresh_field('selected_base_selling_price');
+			return;
+		}
+
+		var item = frappe.model.get_doc('Purchase Order Item', me.selected_item_dn);
+		var args = me._get_args(item);
+		if (!args) {
+			return;
+		}
+
+		Object.assign(args, args.items[0]);
+
+		return frappe.call({
+			method: 'erpnext.stock.get_item_details.get_base_selling_price',
+			args: {args: args, item_code: item.item_code},
+			freeze: 1,
+			callback: function (r) {
+				if (!r.exc) {
+					me.show_set_base_price_dialog(item, new_price, flt(r.message))
+				}
+			}
+		});
+	},
+
+	show_set_base_price_dialog: function (item, new_price, old_price) {
+		var me = this;
+
+		var dialog = new frappe.ui.Dialog({
+			title: __('Update Base Selling Price'),
+			fields: [
+				{
+					label: "Item Code",
+					fieldname: "item_code",
+					fieldtype: "Link",
+					options: "Item",
+					read_only: 1,
+					default: item.item_code
+				},
+				{
+					label: "Price Effective Date",
+					fieldname: "effective_date",
+					fieldtype: "Date",
+					reqd: 1,
+					default: me.frm.doc.schedule_date
+				},
+				{
+					fieldtype: "Column Break",
+				},
+				{
+					label: "Item Name",
+					fieldname: "item_name",
+					fieldtype: "Data",
+					read_only: 1,
+					default: item.item_name
+				},
+				{
+					label: "UOM (Default)",
+					fieldname: "uom",
+					fieldtype: "Data",
+					read_only: 1,
+					default: item.stock_uom
+				},
+				{
+					fieldtype: "Section Break",
+				},
+				{
+					fieldtype: "Section Break",
+				},
+				{
+					label: "Old Base Selling Rate",
+					fieldname: "old_price",
+					fieldtype: "Currency",
+					read_only: 1,
+					default: old_price
+				},
+				{
+					fieldtype: "Column Break",
+				},
+				{
+					label: "New Base Selling Rate",
+					fieldname: "new_price",
+					fieldtype: "Currency",
+					reqd: 1,
+					default: new_price
+				},
+			],
+			primary_action: function() {
+				var data = dialog.get_values();
+				if (!data.new_price) {
+					dialog.hide();
+					return;
+				}
+
+				frappe.call({
+					method: "erpnext.stock.report.price_list.price_list.set_item_pl_rate",
+					args: {
+						effective_date: data.effective_date,
+						item_code: item.item_code,
+						price_list: '',
+						base_price_list: 1,
+						price_list_rate: flt(data.new_price)
+					},
+					callback: function(r) {
+						if (!r.exc) {
+							item.base_selling_price = flt(data.new_price);
+						}
+						me.calculate_gross_profit();
+						me.frm.refresh_fields();
+						dialog.hide();
+					}
+				});
+			},
+			primary_action_label: __('Update')
+		});
+		dialog.show();
+	},
+
+	update_base_selling_price() {
+
+	},
+
+	get_base_selling_prices: function() {
+		if (this.can_get_gross_profit()) {
+			var me = this;
+			return frappe.call({
+				method: 'set_base_selling_price',
+				doc: me.frm.doc,
+				callback: function (r) {
+					if (!r.exc) {
+						me.calculate_taxes_and_totals();
+					}
+				}
+			});
+		}
 	}
 });
 

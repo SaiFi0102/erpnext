@@ -34,6 +34,20 @@ class BuyingController(StockController):
 			return _("From {0} | {1} {2}").format(self.supplier_name, self.currency,
 				self.grand_total)
 
+	def onload(self):
+		if self.doctype == "Purchase Order" and self.docstatus == 0:
+			self.set_base_selling_price()
+			self.calculate_taxes_and_totals()
+
+	def set_base_selling_price(self):
+		from erpnext.stock.get_item_details import get_base_selling_price
+
+		parent_dict = self.get_item_details_parent_args(delivery_date_field='schedule_date')
+		for item in self.get("items"):
+			if item.get("item_code"):
+				args = self.get_item_details_item_args(parent_dict, item)
+				item.base_selling_price = flt(get_base_selling_price(args, item.item_code))
+
 	def validate(self):
 		super(BuyingController, self).validate()
 		if getattr(self, "supplier", None) and not self.supplier_name:

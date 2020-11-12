@@ -80,6 +80,18 @@
   "col_break_warehouse",
   "is_subcontracted",
   "supplier_warehouse",
+  "gross_profit_section",
+  "selected_base_selling_price",
+  "column_break_77",
+  "selected_gross_profit",
+  "column_break_79",
+  "selected_gross_profit_per_unit",
+  "column_break_81",
+  "selected_per_gross_profit",
+  "column_break_83",
+  "total_gross_profit",
+  "column_break_85",
+  "per_gross_profit",
   "items_section",
   "scan_barcode",
   "get_supplier_default_items",
@@ -1481,12 +1493,83 @@
    "options": "{\"format\": \"CODE128B\", \"height\": 40, \"width\": 1, \"displayValue\": false, \"margin\": 0}",
    "read_only": 1,
    "report_hide": 1
+  },
+  {
+   "fieldname": "gross_profit_section",
+   "fieldtype": "Section Break",
+   "label": "Gross Profit"
+  },
+  {
+   "fieldname": "selected_base_selling_price",
+   "fieldtype": "Currency",
+   "label": "Base Selling Price",
+   "options": "Company:company:default_currency",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "column_break_77",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "selected_gross_profit",
+   "fieldtype": "Currency",
+   "label": "Selected Gross Profit",
+   "options": "Company:company:default_currency",
+   "permlevel": 3,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_79",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "selected_gross_profit_per_unit",
+   "fieldtype": "Currency",
+   "label": "Selected Gross Profit/Unit",
+   "options": "Company:company:default_currency",
+   "permlevel": 3,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_81",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "selected_per_gross_profit",
+   "fieldtype": "Percent",
+   "label": "Selected Gross Profit (%)",
+   "permlevel": 3,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_83",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_gross_profit",
+   "fieldtype": "Currency",
+   "label": "Total Gross Profit",
+   "options": "Company:company:default_currency",
+   "permlevel": 3,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_85",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "per_gross_profit",
+   "fieldtype": "Percent",
+   "label": "Total Gross Profit (%)",
+   "options": "Company:company:default_currency",
+   "permlevel": 3,
+   "read_only": 1
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 105,
  "is_submittable": 1,
- "modified": "2020-08-31 09:12:18.888549",
+ "modified": "2020-11-12 13:53:38.398509",
  "modified_by": "Administrator",
  "module": "Buying",
  "name": "Purchase Order",
@@ -1571,6 +1654,12 @@
    "permlevel": 2,
    "read": 1,
    "role": "Landed Cost Role",
+   "write": 1
+  },
+  {
+   "permlevel": 3,
+   "read": 1,
+   "role": "Purchase Analytics Role",
    "write": 1
   }
  ],

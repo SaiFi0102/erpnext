@@ -360,9 +360,12 @@ def get_columns(filters, price_lists):
 	return columns
 
 @frappe.whitelist()
-def set_item_pl_rate(effective_date, item_code, price_list, price_list_rate, is_diff=False, uom=None, conversion_factor=None, filters=None):
+def set_item_pl_rate(effective_date, item_code, price_list, price_list_rate, is_diff=False, uom=None, conversion_factor=None, filters=None, base_price_list=False):
 	effective_date = getdate(effective_date)
 	standard_price_list = frappe.db.get_single_value("Selling Settings", "base_price_list")
+
+	if not price_list and base_price_list:
+		price_list = standard_price_list
 
 	old_standard_rate = frappe.db.sql_list("""
 		select price_list_rate
