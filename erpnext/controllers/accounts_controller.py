@@ -383,13 +383,14 @@ class AccountsController(TransactionBase):
 						frappe.msgprint(_("Row {0}: user has not applied the rule {1} on the item {2}")
 							.format(item.idx, frappe.bold(title), frappe.bold(item.item_code)))
 
-	def force_set_item_prices(self):
+	def force_set_item_prices(self, item_dn=None):
 		from erpnext.stock.get_item_details import apply_price_list_on_item, process_args
 
 		if hasattr(self, "items"):
 			parent_dict = self.get_item_details_parent_args()
 
-			for item in self.get("items"):
+			items = self.get("items") if not item_dn else self.get("items", filters={"name": item_dn})
+			for item in items:
 				if item.get("item_code"):
 					args = self.get_item_details_item_args(parent_dict, item)
 					args = process_args(args)

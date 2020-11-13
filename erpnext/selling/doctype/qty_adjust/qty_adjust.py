@@ -140,6 +140,16 @@ def update_gross_profit_on_sales_orders(so_data, from_date, to_date):
 	update_item_batch_incoming_rate(so_data, po_from_date=from_date, po_to_date=to_date)
 
 	for d in so_data:
+		force_set_selling_item_prices = cint(frappe.get_cached_value("Stock Settings", None, "force_set_selling_item_prices"))
+
+		if d.doc_status == 0 and force_set_selling_item_prices:
+			doc = frappe.get_doc(d.dt, d.dn)
+			doc.force_set_item_prices(d.so_detail)
+			doc_item = doc.get('items', filters={'name': d.so_detail})
+			doc_item = doc_item[0] if doc_item else None
+			if doc_item:
+				d.base_net_amount = doc_item.base_net_amount
+
 		d.cogs_per_unit = flt(d.valuation_rate) * flt(d.conversion_factor)
 		if flt(d.get('alt_uom_size_std')):
 			d.cogs_per_unit *= flt(d.alt_uom_size) / flt(d.alt_uom_size_std)
