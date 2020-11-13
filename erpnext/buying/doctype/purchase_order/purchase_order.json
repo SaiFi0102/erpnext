@@ -1548,7 +1548,7 @@
   {
    "fieldname": "total_gross_profit",
    "fieldtype": "Currency",
-   "label": "Total Gross Profit",
+   "label": "Total PO Gross Profit",
    "options": "Company:company:default_currency",
    "permlevel": 3,
    "read_only": 1
@@ -1560,7 +1560,7 @@
   {
    "fieldname": "per_gross_profit",
    "fieldtype": "Percent",
-   "label": "Total Gross Profit (%)",
+   "label": "Total PO Gross Profit (%)",
    "options": "Company:company:default_currency",
    "permlevel": 3,
    "read_only": 1
@@ -1569,7 +1569,7 @@
  "icon": "fa fa-file-text",
  "idx": 105,
  "is_submittable": 1,
- "modified": "2020-11-12 13:53:38.398509",
+ "modified": "2020-11-13 07:08:43.071944",
  "modified_by": "Administrator",
  "module": "Buying",
  "name": "Purchase Order",
