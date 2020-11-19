@@ -842,7 +842,7 @@ def get_party_details(company, party_type, party, date, cost_center=None):
 	unallocated_advance_payments = frappe.db.sql("""
 		SELECT sum({0}) as amount
 		FROM `tabGL Entry`
-		WHERE party_type = %s and party = %s and ifnull(against_voucher, '') = ''
+		WHERE party_type = %s and party = %s and ifnull(against_voucher, '') in ('', 'Sales Order', 'Purchase Order')
 	""".format("credit_in_account_currency" if party_type == "Customer" else "debit_in_account_currency"),
 		[party_type, party])
 	unallocated_advance_payments = unallocated_advance_payments[0][0] if unallocated_advance_payments else 0.0
