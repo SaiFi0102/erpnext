@@ -171,7 +171,7 @@ frappe.query_reports["Price List"] = {
 	],
 	formatter: function(value, row, column, data, default_formatter) {
 		if (!data) {
-			if (in_list(['po_qty', 'actual_qty'], column.fieldname)) {
+			if (in_list(['po_qty', 'actual_qty', 'projected_qty'], column.fieldname)) {
 				return default_formatter(value, row, column, data);
 			} else {
 				return '';
@@ -314,8 +314,8 @@ frappe.query_reports["Price List"] = {
 		return Object.assign(options, {
 			hooks: {
 				columnTotal: function (values, column, type) {
-					if (in_list(['po_qty', 'actual_qty'], column.column.fieldname)) {
-						frappe.utils.report_column_total(values, column, type);
+					if (in_list(['po_qty', 'actual_qty', 'projected_qty'], column.column.fieldname)) {
+						return frappe.utils.report_column_total(values, column, type);
 					} else {
 						return '';
 					}
