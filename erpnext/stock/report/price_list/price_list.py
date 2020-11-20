@@ -198,8 +198,8 @@ def get_data(filters):
 		d.po_lc_rate = flt(d.po_lc_amount) / d.po_qty if d.po_qty else 0
 		d.valuation_rate = flt(d.stock_value) / d.actual_qty if d.actual_qty else 0
 
-		d.balance_qty = d.actual_qty + d.po_qty
-		d.avg_lc_rate = (flt(d.stock_value) + flt(d.po_lc_amount)) / d.balance_qty if d.balance_qty else 0
+		d.projected_qty = d.actual_qty + d.po_qty
+		d.avg_lc_rate = (flt(d.stock_value) + flt(d.po_lc_amount)) / d.projected_qty if d.projected_qty else 0
 		d.margin_rate = (d.standard_rate - d.avg_lc_rate) * 100 / d.standard_rate if d.standard_rate else None
 
 		for price_list, price in iteritems(item_price_map.get(item_code, {})):
@@ -317,6 +317,7 @@ def get_columns(filters, price_lists):
 		{"fieldname": "po_lc_rate", "label": _("PO LC"), "fieldtype": "Currency", "width": 70, "restricted": True},
 		{"fieldname": "actual_qty", "label": _("Stock Qty"), "fieldtype": "Float", "width": 80, "restricted": True},
 		{"fieldname": "valuation_rate", "label": _("Stock LC"), "fieldtype": "Currency", "width": 70, "restricted": True},
+		{"fieldname": "projected_qty", "label": _("Total Qty"), "fieldtype": "Float", "width": 80, "restricted": True},
 		{"fieldname": "avg_lc_rate", "label": _("Avg LC"), "fieldtype": "Currency", "width": 70, "restricted": True},
 	]
 
