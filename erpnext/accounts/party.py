@@ -626,7 +626,7 @@ def get_partywise_advanced_payment_amount(party_type, posting_date = None, futur
 	data = frappe.db.sql(""" SELECT party, sum({0}) as amount
 		FROM `tabGL Entry`
 		WHERE
-			party_type = %s and against_voucher is null
+			party_type = %s and (ifnull(against_voucher, '') = '' or against_voucher_type in ('Sales Order', 'Purchase Order'))
 			and {1} GROUP BY party"""
 		.format(("credit") if party_type == "Customer" else "debit", cond) , party_type)
 
