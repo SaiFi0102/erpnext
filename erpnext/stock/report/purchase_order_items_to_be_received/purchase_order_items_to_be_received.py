@@ -24,16 +24,16 @@ def get_data(filters):
 
 	data = frappe.db.sql("""
 		select
-			po.`name` as "Purchase Order",
-			i.`schedule_date` as "Arrival Date",
-			po.`supplier` as "Supplier",
-			i.item_code as "Item Code",
-			i.stock_qty as "Ordered Qty",
-			(i.qty - ifnull(i.received_qty, 0)) * i.conversion_factor as "Balance Qty",
-			i.landed_rate * i.conversion_factor as "LC/Unit",
-			i.landed_cost_voucher_amount / (i.qty * i.conversion_factor) as "Expenses/Unit",
-			po.order_type as "Shipping Mode",
-			po.status as "Status"
+			po.`name` as purchase_order,
+			i.`schedule_date` as arrival_date,
+			po.`supplier`,
+			i.item_code,
+			i.stock_qty as ordered_qty,
+			(i.qty - ifnull(i.received_qty, 0)) * i.conversion_factor as balance_qty,
+			i.landed_rate * i.conversion_factor as lc_rate,
+			i.landed_cost_voucher_amount / (i.qty * i.conversion_factor) as lcv_rate,
+			po.order_type as shipping_mode,
+			po.status
 		from
 			`tabPurchase Order` po, `tabPurchase Order Item` i
 		where
@@ -45,8 +45,8 @@ def get_data(filters):
 	""".format(conditions_sql), filters, as_dict=1)
 
 	for d in data:
-		d["LC/Unit"] = flt(d.get("LC/Unit"), 2)
-		d["Expenses/Unit"] = flt(d.get("Expenses/Unit"), 2)
+		d["lc_rate"] = flt(d.get("lc_rate"), 2)
+		d["lcv_rate"] = flt(d.get("lcv_rate"), 2)
 
 	return data
 
@@ -65,8 +65,8 @@ def get_columns():
 	show_amounts = show_amounts_role and show_amounts_role in frappe.get_roles()
 	if show_amounts:
 		columns += [
-			"LC/Unit:Currency:70",
-			"Expenses/Unit:Currency:70",
+			{"label": "LC/Unit", "fieldname": "lc_rate", "fieldtype": "Currency", "width": 70},
+			{"label": "Expenses/Unit", "fieldname": "lcv_rate", "fieldtype": "Currency", "width": 70},
 		]
 
 	columns += [
