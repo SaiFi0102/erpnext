@@ -45,15 +45,15 @@
 	<tbody>
 		{% for(var i=0; i<data.length; i++) { %}
 			<tr>
-                <td>{% if (data[i].is_total_row) { %}<b>Total</b>{% } else { %}{%= data[i][__("Payment Entry")] %}{% } %}</td>
-                <td>{%= frappe.format(data[i][__("Posting Date")], {fieldtype: "Date"}) %}</td>
-                <td>{%= data[i][__("Cheque No")] %}</td>
-                <td>{%= frappe.format(data[i][__("Cheque Date")], {fieldtype: "Date"}) %}</td>
+                <td>{% if (data[i].is_total_row) { %}<b>Total</b>{% } else { %}{%= data[i]["payment_entry"] %}{% } %}</td>
+                <td>{%= frappe.format(data[i]["posting_date"], {fieldtype: "Date"}) %}</td>
+                <td>{%= data[i]["cheque_no"] %}</td>
+                <td>{%= frappe.format(data[i]["cheque_date"], {fieldtype: "Date"}) %}</td>
                 {% if (filters.from_date && filters.to_date && !filters.clearance_date) { %}
-                    <td>{%= data[i][__("Clearance Date")] %}</td>
+                    <td>{%= data[i]["clearance_date"] %}</td>
                 {% } %}
-                <td>{%= data[i][__("Against Account")] %}</td>
-                <td>{%= frappe.format(data[i][__("Amount")], {fieldtype: "Currency"}) %}</td>
+                <td>{%= data[i]["against_account"] %}</td>
+                <td>{%= frappe.format(data[i]["amount"], {fieldtype: "Currency"}) %}</td>
 			</tr>
 		{% } %}
     </tbody>
