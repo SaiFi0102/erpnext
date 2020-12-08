@@ -17,7 +17,7 @@ erpnext.financial_statements = {
 		};
 
 		if (column.from_date && column.to_date && data.account) {
-			options.link_href = encodeURI(`desk#query-report/General Ledger?account=${data.account}&from_date=${column.from_date}&to_date=${column.to_date}`);
+			options.link_href = `desk#query-report/General Ledger?account=${encodeURIComponent(data.account)}&from_date=${column.from_date}&to_date=${column.to_date}`;
 		}
 
 		value = default_formatter(value, row, column, data, options);
