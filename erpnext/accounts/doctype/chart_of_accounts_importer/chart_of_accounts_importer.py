@@ -93,11 +93,12 @@ def generate_data_from_excel(file_doc, extension, as_dict=False):
 	del rows[0]
 
 	for row in rows:
-		if as_dict:
-			data.append({frappe.scrub(header): row[index] for index, header in enumerate(headers)})
-		else:
-			if not row[1]: row[1] = row[0]
-			data.append(row)
+		if row:
+			if as_dict:
+				data.append({frappe.scrub(header): row[index] for index, header in enumerate(headers)})
+			else:
+				if not row[1]: row[1] = row[0]
+				data.append(row)
 
 	return data
 
