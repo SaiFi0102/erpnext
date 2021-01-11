@@ -283,6 +283,13 @@ def make_return_doc(doctype, source_name, target_doc=None):
 		if doctype == "Sales Invoice":
 			doc.is_pos = source.is_pos
 
+			delivery_charges_account = frappe.get_cached_value("Company", doc.company, "delivery_charges_account")
+			if delivery_charges_account:
+				doc.delivery_charges = 0
+				delivery_charges_rows = doc.get('taxes', filters={"account_head": delivery_charges_account})
+				for d in delivery_charges_rows:
+					d.tax_amount = 0
+
 			# look for Print Heading "Credit Note"
 			if not doc.select_print_heading:
 				doc.select_print_heading = frappe.db.get_value("Print Heading", _("Credit Note"))
