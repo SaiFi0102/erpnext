@@ -96,7 +96,7 @@ class Batch(Document):
 
 			if create_new_batch:
 				if batch_number_series:
-					batch_number_series = self.replace_supplier_code_namng_series(batch_number_series)
+					batch_number_series = self.replace_custom_naming_series(batch_number_series)
 					self.batch_id = make_autoname(batch_number_series, self.doctype, self)
 				elif batch_uses_naming_series():
 					self.batch_id = self.get_name_from_naming_series()
@@ -145,12 +145,17 @@ class Batch(Document):
 		"""
 		naming_series_prefix = _get_batch_prefix()
 		# validate_template(naming_series_prefix)
-		naming_series_prefix = self.replace_supplier_code_namng_series(naming_series_prefix)
+		naming_series_prefix = self.replace_custom_naming_series(naming_series_prefix)
 		name = make_autoname(naming_series_prefix, self.doctype, self)
 
 		return name
 
-	def replace_supplier_code_namng_series(self, series):
+	def replace_custom_naming_series(self, series):
+		series = self.replace_supplier_code_naming_series(series)
+		series = self.replace_pickup_no_naming_series(series)
+		return series
+
+	def replace_supplier_code_naming_series(self, series):
 		if '.{SC}.' in series:
 			supplier_code = None
 			if self.supplier:
@@ -165,6 +170,17 @@ class Batch(Document):
 				else:
 					frappe.throw(_("Cannot automatically create Batch No for Item {0} because no Supplier can be found. Please create Batch manually.")
 						.format(self.item))
+
+		return series
+
+	def replace_pickup_no_naming_series(self, series):
+		if '.{PN}.' in series:
+			series = series.replace('.{PN}.', '.{pickup_no}.')
+
+		if '.{pickup_no}.' in series:
+			if not self.get('pickup_no'):
+				frappe.throw(_("Cannot automatically create Batch No for Item {0} because no Pickup Number can be found. Please create Batch manually.")
+					.format(self.item))
 
 		return series
 

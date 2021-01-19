@@ -19,6 +19,7 @@
   "expiry_date",
   "source",
   "supplier",
+  "pickup_no",
   "column_break_9",
   "reference_doctype",
   "reference_name",
@@ -145,13 +146,19 @@
    "oldfieldname": "description",
    "oldfieldtype": "Small Text",
    "width": "300px"
+  },
+  {
+   "fieldname": "pickup_no",
+   "fieldtype": "Data",
+   "label": "Pickup #",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-archive",
  "idx": 1,
  "image_field": "image",
  "max_attachments": 5,
- "modified": "2020-08-24 06:18:59.054592",
+ "modified": "2021-01-19 09:59:58.721173",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Batch",

@@ -238,6 +238,7 @@ class StockController(AccountsController):
 						doctype='Batch',
 						item=d.item_code,
 						supplier=getattr(self, 'supplier', None),
+						pickup_no=getattr(self, 'pickup_no', None),
 						reference_doctype=self.doctype,
 						reference_name=self.name)).insert().name
 
