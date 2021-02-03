@@ -508,7 +508,10 @@ frappe.ui.form.on('Payment Entry', {
 				frappe.call({
 					method: "erpnext.accounts.doctype.journal_entry.journal_entry.get_average_exchange_rate",
 					args: {
-						account: frm.doc.paid_from
+						account: frm.doc.paid_from,
+						from_currency: frm.doc.paid_from_account_currency,
+						to_currency: company_currency,
+						transaction_date: frm.doc.posting_date
 					},
 					callback: function(r, rt) {
 						frm.set_value("source_exchange_rate", r.message);
