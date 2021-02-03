@@ -77,6 +77,7 @@ class Employee(NestedSet):
 			self.update_user()
 			self.update_user_permissions()
 		self.reset_employee_emails_cache()
+		self.create_sales_person()
 
 	def update_user_permissions(self):
 		if not self.create_user_permission: return
@@ -225,6 +226,20 @@ class Employee(NestedSet):
 			self.get('user_id') != prev_doc.get('user_id')):
 			frappe.cache().hdel('employees_with_number', cell_number)
 			frappe.cache().hdel('employees_with_number', prev_number)
+
+	def create_sales_person(self):
+		from frappe.utils.nestedset import get_root_of
+
+		if not self.get('is_sales'):
+			return
+
+		if not frappe.db.get_value("Sales Person", filters={"employee": self.name}):
+			root_sales_person = get_root_of("Sales Person")
+			doc = frappe.new_doc("Sales Person")
+			doc.sales_person_name = self.employee_name
+			doc.employee = self.name
+			doc.parent_sales_person = root_sales_person
+			doc.save(ignore_permissions=True)
 
 def get_timeline_data(doctype, name):
 	'''Return timeline for attendance'''
