@@ -50,6 +50,10 @@ def create_customer_or_supplier():
 	if not doctype:
 		return
 
+	if doctype == "Customer":
+		from erpnext.shopping_cart.cart import get_party
+		return get_party(user)
+
 	if party_exists(doctype, user):
 		return
 
