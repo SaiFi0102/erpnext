@@ -94,6 +94,14 @@ class ExchangeRateRevaluation(Document):
 		if self.total_gain_loss == 0:
 			return
 
+		existing = frappe.get_all("Journal Entry", filters={
+			"reference_type": "Exchange Rate Revaluation",
+			"reference_name": self.name,
+			"docstatus": 1
+		}, distinct=1)
+		if existing:
+			frappe.throw(_("{0} already exists").format(", ".join([frappe.get_desk_link("Journal Entry", d.name) for d in existing])))
+
 		unrealized_exchange_gain_loss_account = frappe.get_cached_value('Company',  self.company, 
 			"unrealized_exchange_gain_loss_account")
 		if not unrealized_exchange_gain_loss_account:

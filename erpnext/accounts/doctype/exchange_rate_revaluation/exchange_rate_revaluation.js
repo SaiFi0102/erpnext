@@ -3,6 +3,10 @@
 
 frappe.ui.form.on('Exchange Rate Revaluation', {
 	setup: function(frm) {
+		frm.custom_make_buttons = {
+			'Journal Entry': 'Create Journal Entry',
+		}
+
 		frm.set_query("party_type", "accounts", function() {
 			return {
 				"filters": {
