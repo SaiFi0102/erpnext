@@ -386,7 +386,7 @@ def set_item_pl_rate(effective_date, item_code, price_list, price_list_rate, is_
 	dependent_item_prices = []
 	if price_list == standard_price_list and old_standard_rate:
 		dependent_item_prices = frappe.db.sql("""
-			select p.price_list, p.price_list_rate - %s as diff
+			select p.price_list, p.price_list_rate - %s as diff, p.uom
 			from `tabItem Price` p
 			inner join `tabPrice List` pl on pl.name = p.price_list and pl.enabled = 1 and pl.selling = 1
 			where p.item_code = %s and p.price_list != %s and pl.prices_independent_of_base_price != 1
