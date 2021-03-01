@@ -148,8 +148,7 @@ def get_data():
 				{
 					"type": "doctype",
 					"name": "Price List",
-					"description": _("Price List master."),
-					"onboard": 1,
+					"description": _("Price List master.")
 				},
 				{
 					"type": "doctype",
