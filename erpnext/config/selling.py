@@ -143,6 +143,7 @@ def get_data():
 					"label": _("Price List Editor"),
 					"doctype": "Item Price",
 					"onboard": 1,
+					"dependencies": ["Item", "Price List"],
 				},
 				{
 					"type": "doctype",
