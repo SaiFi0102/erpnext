@@ -136,6 +136,15 @@ def get_data():
 			"label": _("Pricing"),
 			"items": [
 				{
+					"type": "report",
+					"is_query_report": True,
+					"name": "Price List",
+					"route": "#query-report/Price List",
+					"label": _("Price List Editor"),
+					"doctype": "Item Price",
+					"onboard": 1,
+				},
+				{
 					"type": "doctype",
 					"name": "Price List",
 					"description": _("Price List master."),
@@ -147,15 +156,6 @@ def get_data():
 					"description": _("Multiple Item prices."),
 					"route": "#Report/Item Price",
 					"dependencies": ["Item", "Price List"],
-					"onboard": 1,
-				},
-				{
-					"type": "report",
-					"is_query_report": True,
-					"name": "Price List",
-					"route": "#query-report/Price List",
-					"label": _("Price List Editor"),
-					"doctype": "Item Price",
 				},
 				{
 					"type": "doctype",
