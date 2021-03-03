@@ -364,13 +364,22 @@ def get_result_as_list(data, filters):
 			d['debit'] = d['credit'] = 0
 
 		d['account_currency'] = filters.account_currency
-		d['bill_no'] = inv_details.get(d.get('against_voucher'), '')
+		d['bill_no'] = inv_details.get(d.get('voucher_no')) or inv_details.get(d.get('against_voucher'), '')
 
 	return data
 
 def get_supplier_invoice_details():
 	inv_details = {}
+
 	for d in frappe.db.sql(""" select name, bill_no from `tabPurchase Invoice`
+		where docstatus = 1 and bill_no is not null and bill_no != '' """, as_dict=1):
+		inv_details[d.name] = d.bill_no
+
+	for d in frappe.db.sql(""" select name, bill_no from `tabJournal Entry`
+		where docstatus = 1 and bill_no is not null and bill_no != '' """, as_dict=1):
+		inv_details[d.name] = d.bill_no
+
+	for d in frappe.db.sql(""" select name, bill_no from `tabLanded Cost Voucher`
 		where docstatus = 1 and bill_no is not null and bill_no != '' """, as_dict=1):
 		inv_details[d.name] = d.bill_no
 
