@@ -289,6 +289,7 @@
    "in_standard_filter": 1,
    "label": "Arrival Date",
    "no_copy": 1,
+   "search_index": 1,
    "width": "83"
   },
   {
@@ -1569,7 +1570,7 @@
  "icon": "fa fa-file-text",
  "idx": 105,
  "is_submittable": 1,
- "modified": "2020-11-13 07:08:43.071944",
+ "modified": "2021-03-12 12:20:09.381098",
  "modified_by": "Administrator",
  "module": "Buying",
  "name": "Purchase Order",

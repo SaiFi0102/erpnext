@@ -1601,7 +1601,8 @@
   {
    "fieldname": "delivery_date",
    "fieldtype": "Date",
-   "label": "Delivery Date"
+   "label": "Delivery Date",
+   "search_index": 1
   },
   {
    "fieldname": "comm_1",
@@ -1982,7 +1983,7 @@
  "icon": "fa fa-file-text",
  "idx": 181,
  "is_submittable": 1,
- "modified": "2021-01-11 05:10:00.933214",
+ "modified": "2021-03-12 12:22:41.627458",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Sales Invoice",
