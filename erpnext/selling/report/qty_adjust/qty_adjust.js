@@ -37,6 +37,25 @@ frappe.query_reports["Qty Adjust"] = {
 			options:"Brand",
 		},
 	],
+	onChange: function(new_value, column, data, rowIndex) {
+		if (["ppk", "physical_stock"].includes(column.fieldname)) {
+			var row = frappe.query_report.datatable.datamanager.data[rowIndex];
+			row[column.fieldname] = flt(new_value);
+			row.net_short_excess = flt(row.physical_stock) + flt(row.ppk) + flt(row.total_selected_po_qty) - flt(row.total_selected_so_qty);
+
+			frappe.query_report.datatable.datamanager.rowCount = 0;
+			frappe.query_report.datatable.datamanager.columns = [];
+			frappe.query_report.datatable.datamanager.rows = [];
+
+			frappe.query_report.datatable.datamanager.prepareColumns();
+			frappe.query_report.datatable.datamanager.prepareRows();
+			frappe.query_report.datatable.datamanager.prepareTreeRows();
+			frappe.query_report.datatable.datamanager.prepareRowView();
+			frappe.query_report.datatable.datamanager.prepareNumericColumns();
+
+			frappe.query_report.datatable.bodyRenderer.render();
+		}
+	},
 	formatter: function(value, row, column, data, default_formatter) {
 		var options = {
 			css: {},

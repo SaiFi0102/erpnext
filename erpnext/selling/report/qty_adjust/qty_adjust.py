@@ -188,4 +188,25 @@ def get_columns(filters):
 			"width": 64
 		})
 
+	columns.append({
+		"fieldname": "physical_stock",
+		"label": _("Phys. Stock"),
+		"fieldtype": "Float",
+		"width": 90,
+		"editable": 1
+	})
+	columns.append({
+		"fieldname": "ppk",
+		"label": _("PPK"),
+		"fieldtype": "Float",
+		"width": 65,
+		"editable": 1
+	})
+	columns.append({
+		"fieldname": "net_short_excess",
+		"label": _("Net +/-"),
+		"fieldtype": "Float",
+		"width": 65
+	})
+
 	return columns
