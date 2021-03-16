@@ -1,0 +1,213 @@
+{
+ "autoname": "naming_series:",
+ "creation": "2021-03-16 10:04:33.446455",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "from_date",
+  "column_break_3",
+  "to_date",
+  "amended_from",
+  "section_break_5",
+  "item_group",
+  "get_items",
+  "column_break_7",
+  "brand",
+  "section_break_9",
+  "items",
+  "section_break_13",
+  "total_actual_qty",
+  "column_break_15",
+  "total_po_qty",
+  "column_break_17",
+  "total_available_qty",
+  "column_break_19",
+  "total_so_qty",
+  "column_break_21",
+  "total_short_excess",
+  "section_break_23",
+  "total_physical_stock",
+  "column_break_25",
+  "total_ppk",
+  "column_break_27",
+  "total_net_short_excess"
+ ],
+ "fields": [
+  {
+   "default": "QASC-",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Series",
+   "options": "QASC-"
+  },
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "From Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "To Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_5",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "item_group",
+   "fieldtype": "Link",
+   "label": "Item Group",
+   "options": "Item Group"
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "brand",
+   "fieldtype": "Link",
+   "label": "Brand",
+   "options": "Brand"
+  },
+  {
+   "fieldname": "section_break_9",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Qty Adjust Stock Count",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "no_copy": 1,
+   "options": "Qty Adjust Stock Count Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "get_items",
+   "fieldtype": "Button",
+   "label": "Get Items"
+  },
+  {
+   "fieldname": "section_break_13",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "total_actual_qty",
+   "fieldtype": "Float",
+   "label": "Total In Stock",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_15",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_po_qty",
+   "fieldtype": "Float",
+   "label": "Total PO Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_17",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_available_qty",
+   "fieldtype": "Float",
+   "label": "Total Available Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_19",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_so_qty",
+   "fieldtype": "Float",
+   "label": "Total SO Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_21",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_short_excess",
+   "fieldtype": "Float",
+   "label": "Total Short(-)/Excess",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_physical_stock",
+   "fieldtype": "Float",
+   "label": "Total Physical Stock",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_25",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_ppk",
+   "fieldtype": "Float",
+   "label": "Total PPK",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_27",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_net_short_excess",
+   "fieldtype": "Float",
+   "label": "Total Net +/-",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_23",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "is_submittable": 1,
+ "modified": "2021-03-16 10:50:42.413710",
+ "modified_by": "Administrator",
+ "module": "Selling",
+ "name": "Qty Adjust Stock Count",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

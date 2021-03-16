@@ -1,0 +1,110 @@
+{
+ "creation": "2021-03-16 10:11:10.278527",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_code",
+  "item_name",
+  "actual_qty",
+  "total_selected_po_qty",
+  "total_available_qty",
+  "total_selected_so_qty",
+  "short_excess",
+  "physical_stock",
+  "ppk",
+  "net_short_excess"
+ ],
+ "fields": [
+  {
+   "columns": 1,
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item Code",
+   "options": "Item",
+   "read_only": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Item Name",
+   "read_only": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "actual_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "In Stock",
+   "read_only": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "total_selected_po_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "PO Qty",
+   "read_only": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "total_available_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Available Qty",
+   "read_only": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "total_selected_so_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "SO Qty",
+   "read_only": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "short_excess",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Short(-)/Excess",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "physical_stock",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Phys. Stock"
+  },
+  {
+   "columns": 1,
+   "fieldname": "ppk",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "PPK"
+  },
+  {
+   "columns": 1,
+   "fieldname": "net_short_excess",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Net +/-",
+   "read_only": 1
+  }
+ ],
+ "istable": 1,
+ "modified": "2021-03-16 10:39:40.481846",
+ "modified_by": "Administrator",
+ "module": "Selling",
+ "name": "Qty Adjust Stock Count Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
