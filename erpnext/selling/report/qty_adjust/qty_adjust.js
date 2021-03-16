@@ -85,5 +85,11 @@ frappe.query_reports["Qty Adjust"] = {
 		}
 
 		return default_formatter(value, row, column, data, options);
+	},
+
+	onload: function(report) {
+		report.page.add_inner_button(__("Qty Adjust Stock Count"), function() {
+			frappe.set_route('List', 'Qty Adjust Stock Count');
+		});
 	}
 };
