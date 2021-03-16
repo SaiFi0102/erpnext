@@ -30,6 +30,8 @@ class QtyAdjustStockCount(Document):
 		for d in data:
 			self.append('items', d)
 
+		self.calculate_totals()
+
 	def calculate_totals(self):
 		for d in self.items:
 			d.net_short_excess = flt(d.physical_stock) + flt(d.ppk) + flt(d.total_selected_po_qty) - flt(d.total_selected_so_qty)
