@@ -41,7 +41,7 @@ frappe.query_reports["Qty Adjust"] = {
 		if (["ppk", "physical_stock"].includes(column.fieldname)) {
 			var row = frappe.query_report.datatable.datamanager.data[rowIndex];
 			row[column.fieldname] = flt(new_value);
-			row.net_short_excess = flt(row.physical_stock) + flt(row.ppk) + flt(row.total_selected_po_qty) - flt(row.total_selected_so_qty);
+			row.net_short_excess = flt(row.physical_stock) + flt(row.total_selected_po_qty) - flt(row.total_selected_so_qty) - flt(row.ppk);
 
 			frappe.query_report.datatable.datamanager.rowCount = 0;
 			frappe.query_report.datatable.datamanager.columns = [];

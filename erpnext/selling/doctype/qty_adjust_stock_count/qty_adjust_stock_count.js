@@ -47,7 +47,7 @@ erpnext.selling.QtyAdjustStockCountController = frappe.ui.form.Controller.extend
 
 	calculate_totals: function () {
 		$.each(this.frm.doc.items || [], function (i, d) {
-			d.net_short_excess = flt(d.physical_stock) + flt(d.ppk) + flt(d.total_selected_po_qty) - flt(d.total_selected_so_qty);
+			d.net_short_excess = flt(d.physical_stock) + flt(d.total_selected_po_qty) - flt(d.total_selected_so_qty) - flt(d.ppk)
 		});
 
 		this.frm.doc.total_actual_qty = frappe.utils.sum((this.frm.doc.items || []).map(d => d.actual_qty));
