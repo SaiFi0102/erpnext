@@ -5,7 +5,7 @@
 from __future__ import unicode_literals
 import frappe
 from frappe import _
-from frappe.utils import flt
+from frappe.utils import flt, cstr
 from frappe.model.document import Document
 from erpnext.selling.report.qty_adjust.qty_adjust import get_data
 
@@ -31,6 +31,21 @@ class QtyAdjustStockCount(Document):
 			self.append('items', d)
 
 		self.calculate_totals()
+
+		sorter = None
+		if self.sort_by == "Item Code":
+			sorter = lambda d: cstr(d.item_code)
+		elif self.sort_by == "Item Name":
+			sorter = lambda d: cstr(d.item_name)
+		elif self.sort_by == "Net +/-":
+			sorter = lambda d: flt(d.net_short_excess)
+		elif self.sort_by == "Short(-)/Excess":
+			sorter = lambda d: flt(d.short_excess)
+
+		if sorter:
+			self.items = sorted(self.items, key=sorter)
+			for i, d in enumerate(self.items):
+				d.idx = i + 1
 
 	def calculate_totals(self):
 		for d in self.items:
