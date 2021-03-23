@@ -32,6 +32,7 @@ erpnext.selling.QtyAdjustStockCountController = frappe.ui.form.Controller.extend
 			callback: function(r) {
 				if(!r.exc) {
 					me.frm.dirty();
+					me.refresh_qty_warining_color();
 				}
 			}
 		});
@@ -46,20 +47,49 @@ erpnext.selling.QtyAdjustStockCountController = frappe.ui.form.Controller.extend
 	},
 
 	calculate_totals: function () {
+		var me = this;
+
+		this.frm.doc.total_actual_qty = 0;
+		this.frm.doc.total_po_qty = 0;
+		this.frm.doc.total_available_qty = 0;
+		this.frm.doc.total_so_qty = 0;
+		this.frm.doc.total_short_excess = 0;
+		this.frm.doc.total_physical_stock = 0;
+		this.frm.doc.total_ppk = 0;
+		this.frm.doc.total_net_short_excess = 0;
+
 		$.each(this.frm.doc.items || [], function (i, d) {
-			d.net_short_excess = flt(d.physical_stock) + flt(d.total_selected_po_qty) - flt(d.total_selected_so_qty) - flt(d.ppk)
+			d.net_short_excess = flt(d.physical_stock) + flt(d.total_selected_po_qty) - flt(d.total_selected_so_qty) - flt(d.ppk);
+
+			me.frm.doc.total_actual_qty += flt(d.actual_qty);
+			me.frm.doc.total_po_qty += flt(d.total_selected_po_qty);
+			me.frm.doc.total_available_qty += flt(d.total_available_qty);
+			me.frm.doc.total_so_qty += flt(d.total_selected_so_qty);
+			me.frm.doc.total_short_excess += flt(d.short_excess);
+			me.frm.doc.total_physical_stock += flt(d.physical_stock);
+			me.frm.doc.total_ppk += flt(d.ppk);
+			me.frm.doc.total_net_short_excess += flt(d.net_short_excess);
+
+			me.set_qty_warning_color(d);
 		});
 
-		this.frm.doc.total_actual_qty = frappe.utils.sum((this.frm.doc.items || []).map(d => d.actual_qty));
-		this.frm.doc.total_po_qty = frappe.utils.sum((this.frm.doc.items || []).map(d => d.total_selected_po_qty));
-		this.frm.doc.total_available_qty = frappe.utils.sum((this.frm.doc.items || []).map(d => d.total_available_qty));
-		this.frm.doc.total_so_qty = frappe.utils.sum((this.frm.doc.items || []).map(d => d.total_selected_so_qty));
-		this.frm.doc.total_short_excess = frappe.utils.sum((this.frm.doc.items || []).map(d => d.short_excess));
-		this.frm.doc.total_physical_stock = frappe.utils.sum((this.frm.doc.items || []).map(d => d.physical_stock));
-		this.frm.doc.total_ppk = frappe.utils.sum((this.frm.doc.items || []).map(d => d.ppk));
-		this.frm.doc.total_net_short_excess = frappe.utils.sum((this.frm.doc.items || []).map(d => d.net_short_excess));
-
 		this.frm.refresh_fields();
+	},
+
+	refresh_qty_warining_color: function () {
+		var me = this;
+		$.each(this.frm.doc.items || [], function (i, d) {
+			me.set_qty_warning_color(d);
+		});
+	},
+
+	set_qty_warning_color: function(item) {
+		var warn = flt(item.net_short_excess) < 0;
+		var grid_row = this.frm.get_field("items").grid.get_grid_row(item.name);
+		if (grid_row) {
+			$("[data-fieldname='net_short_excess']", grid_row.wrapper)
+				.css("color", warn ? "red" : "inherit");
+		}
 	},
 });
 
