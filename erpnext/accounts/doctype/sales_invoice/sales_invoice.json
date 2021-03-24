@@ -1440,7 +1440,8 @@
    "oldfieldname": "is_opening",
    "oldfieldtype": "Select",
    "options": "No\nYes",
-   "print_hide": 1
+   "print_hide": 1,
+   "search_index": 1
   },
   {
    "fieldname": "c_form_applicable",
@@ -1983,7 +1984,7 @@
  "icon": "fa fa-file-text",
  "idx": 181,
  "is_submittable": 1,
- "modified": "2021-03-12 12:22:41.627458",
+ "modified": "2021-03-24 15:41:27.963439",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Sales Invoice",
@@ -2110,6 +2111,12 @@
    "read": 1,
    "role": "Sales Analytics Role",
    "write": 1
+  },
+  {
+   "export": 1,
+   "read": 1,
+   "report": 1,
+   "role": "PowerBI Role"
   }
  ],
  "quick_entry": 1,
