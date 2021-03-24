@@ -32,7 +32,7 @@ erpnext.selling.QtyAdjustStockCountController = frappe.ui.form.Controller.extend
 			callback: function(r) {
 				if(!r.exc) {
 					me.frm.dirty();
-					me.refresh_qty_warining_color();
+					me.refresh_qty_warning_color();
 				}
 			}
 		});
@@ -76,7 +76,7 @@ erpnext.selling.QtyAdjustStockCountController = frappe.ui.form.Controller.extend
 		this.frm.refresh_fields();
 	},
 
-	refresh_qty_warining_color: function () {
+	refresh_qty_warning_color: function () {
 		var me = this;
 		$.each(this.frm.doc.items || [], function (i, d) {
 			me.set_qty_warning_color(d);
