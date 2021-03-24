@@ -127,6 +127,22 @@ def get_data(filters):
 		order by p.valid_upto desc
 	""".format(item_conditions, price_lists_cond, previous_price_date_cond), filters, as_dict=1)
 
+	pricing_rule_map = {}
+	if filters.get('customer'):
+		pricing_rule_data = frappe.db.sql("""
+			select pr.name, pr_item.item_code, pr.rate, pr.for_price_list
+			from `tabPricing Rule` pr
+			inner join `tabPricing Rule Item Code` pr_item on pr_item.parent = pr.name
+			where pr.disable = 0 and pr.selling = 1
+				and pr.apply_on = 'Item Code' and pr.price_or_product_discount = 'Price' and pr.rate_or_discount = 'Rate'
+				and pr.applicable_for = 'Customer' and pr.customer = %(customer)s
+				and %(date)s between ifnull(pr.valid_from, '2000-01-01') and ifnull(pr.valid_upto, '2500-12-31')
+			order by ifnull(priority, 0) desc
+		""", filters, as_dict=1)
+
+		for d in pricing_rule_data:
+			pricing_rule_map.setdefault(d.item_code, {}).setdefault(cstr(d.for_price_list), d)
+
 	items_map = {}
 	for d in item_data:
 		default_uom = d.purchase_uom if filters.buying_selling == "Buying" else d.sales_uom
@@ -202,6 +218,16 @@ def get_data(filters):
 		d.avg_lc_rate = (flt(d.stock_value) + flt(d.po_lc_amount)) / d.projected_qty if d.projected_qty else 0
 		d.margin_rate = (d.standard_rate - d.avg_lc_rate) * 100 / d.standard_rate if d.standard_rate else None
 
+		pricing_rule = pricing_rule_map.get(item_code, {}).get('')
+		if pricing_rule:
+			for price_list in price_lists:
+				d['pricing_rule_' + scrub(price_list)] = pricing_rule.name
+				d['pricing_rule_rate_' + scrub(price_list)] = pricing_rule.rate
+		for price_list, pricing_rule in iteritems(pricing_rule_map.get(item_code, {})):
+			if price_list:
+				d['pricing_rule_' + scrub(price_list)] = pricing_rule.name
+				d['pricing_rule_rate_' + scrub(price_list)] = pricing_rule.rate
+
 		for price_list, price in iteritems(item_price_map.get(item_code, {})):
 			d["rate_" + scrub(price_list)] = price.current_price
 			if d.standard_rate is not None:
@@ -213,7 +239,10 @@ def get_data(filters):
 			if price.stock_item_price:
 				d["stock_item_price"] = price.stock_item_price
 
-		d['print_rate'] = d.get("rate_" + scrub(selected_price_list)) if selected_price_list else d.standard_rate
+		if selected_price_list:
+			d['print_rate'] = d.get("pricing_rule_rate_" + scrub(selected_price_list)) or d.get("rate_" + scrub(selected_price_list))
+		else:
+			d['print_rate'] = d.get("pricing_rule_rate_" + scrub(filters.standard_price_list)) or d.standard_rate
 
 	if filters.filter_items_without_price:
 		to_remove = []
