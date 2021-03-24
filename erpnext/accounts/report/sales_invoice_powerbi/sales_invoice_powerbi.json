@@ -1,0 +1,29 @@
+{
+ "add_total_row": 0,
+ "creation": "2021-03-24 15:03:25.829853",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": "SD - AR",
+ "modified": "2021-03-24 16:04:57.899474",
+ "modified_by": "Administrator",
+ "module": "Accounts",
+ "name": "Sales Invoice PowerBI",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "SELECT\n    sales.posting_date AS date,\n    sales.name         AS document,\n    sales.customer,\n    c.territory,\n    steam.sales_person,\n    item.item_code,\n    im.item_name,\n    im.item_group,\n    im.brand,\n    item.stock_qty * ifnull(steam.allocated_percentage, 100) / 100 AS box,\n    item.alt_uom_qty * ifnull(steam.allocated_percentage, 100) / 100 AS lbs,\n    item.net_amount * ifnull(steam.allocated_percentage, 100) / 100 as net_amount\n\nFROM `tabSales Invoice` AS sales\nINNER JOIN `tabSales Invoice Item` AS item ON item.parent = sales.name\nINNER JOIN `tabCustomer` AS c ON c.name = sales.customer\nINNER JOIN `tabItem` AS im ON im.name = item.item_code\nLEFT JOIN `tabSales Team` AS steam on steam.parent = sales.name and steam.parenttype = 'Sales Invoice'\n\nWHERE sales.docstatus = 1 AND sales.is_opening != 'Yes'\n\nORDER BY sales.posting_date DESC",
+ "ref_doctype": "Sales Invoice",
+ "report_name": "Sales Invoice PowerBI",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "PowerBI Role"
+  },
+  {
+   "role": "System Manager"
+  }
+ ]
+}
