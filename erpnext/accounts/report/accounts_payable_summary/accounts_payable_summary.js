@@ -85,10 +85,10 @@ frappe.query_reports["Accounts Payable Summary"] = {
 		var link;
 		var filters = frappe.query_report.get_values();
 		if (data && column.fieldname == 'advance_amount' && flt(value)) {
-			link = encodeURI("desk#Form/Payment Reconciliation/Payment Reconciliation?company="+filters.company+"&party_type=Supplier&party=" + data['Supplier']);
+			link = encodeURI("desk#Form/Payment Reconciliation/Payment Reconciliation?company="+filters.company+"&party_type=Supplier&party=" + data['supplier']);
 		}
-		if (data && column.fieldname == __("Supplier")) {
-			link = encodeURI("desk#query-report/Accounts Payable/Accounts Payable?supplier=" + data['Supplier'] + "&report_date=" + filters.report_date);
+		if (data && column.fieldname == __("supplier")) {
+			link = encodeURI("desk#query-report/Accounts Payable/Accounts Payable?supplier=" + data['supplier'] + "&report_date=" + filters.report_date);
 		}
 
 		return default_formatter(value, row, column, data, {link_href: link, link_target: "_blank"});
