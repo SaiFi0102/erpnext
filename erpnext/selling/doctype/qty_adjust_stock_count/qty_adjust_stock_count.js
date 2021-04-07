@@ -15,6 +15,11 @@ erpnext.selling.QtyAdjustStockCountController = frappe.ui.form.Controller.extend
 		if (!this.frm.doc.to_date) {
 			this.frm.doc.to_date = frappe.datetime.add_days(frappe.datetime.get_today(), 1);
 		}
+		this.local_changes = {};
+	},
+
+	after_save: function () {
+		this.local_changes = {};
 	},
 
 	refresh: function() {
@@ -38,11 +43,15 @@ erpnext.selling.QtyAdjustStockCountController = frappe.ui.form.Controller.extend
 		});
 	},
 
-	ppk: function () {
+	ppk: function (doc, cdt, cdn) {
+		var row = frappe.get_doc(cdt, cdn);
+		this.log_local_changes(cdt, cdn, 'ppk', row.ppk);
 		this.calculate_totals();
 	},
 
-	physical_stock: function () {
+	physical_stock: function (doc, cdt, cdn) {
+		var row = frappe.get_doc(cdt, cdn);
+		this.log_local_changes(cdt, cdn, 'physical_stock', row.physical_stock);
 		this.calculate_totals();
 	},
 
@@ -89,6 +98,31 @@ erpnext.selling.QtyAdjustStockCountController = frappe.ui.form.Controller.extend
 		if (grid_row) {
 			$("[data-fieldname='net_short_excess']", grid_row.wrapper)
 				.css("color", warn ? "red" : "inherit");
+		}
+	},
+
+	log_local_changes: function (dt, dn, fieldname, value) {
+		var key = [dt, dn, fieldname];
+		this.local_changes[key] = {dt, dn, fieldname, value};
+	},
+
+	doc_update: function () {
+		if(!this.frm.doc.__islocal) {
+			frappe.model.remove_from_locals(this.frm.doctype, this.frm.docname);
+			return frappe.model.with_doc(this.frm.doctype, this.frm.docname, () => {
+				this.frm.refresh();
+				var changed = false;
+				$.each(this.local_changes || {}, function (key, data) {
+					var row = frappe.get_doc(data.dt, data.dn);
+					row[data.fieldname] = data.value;
+					changed = true;
+				});
+				this.calculate_totals();
+
+				if (changed) {
+					this.frm.dirty();
+				}
+			});
 		}
 	},
 });
